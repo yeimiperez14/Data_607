@@ -1,0 +1,199 @@
+---
+title: "Assignment_2A: SQL and R - Movie Ratings"
+Author: Yeimi Perez
+format: html
+editor: visual
+---
+
+```{r}
+library(RPostgres)
+```
+
+```{r}
+library(DBI)
+library(RPostgres)
+```
+
+Loading the packages to communicate with databases. Loading PostgreSQL driver so R connects to PostgreSQL database.
+
+```{r}
+con <- dbConnect(
+  RPostgres::Postgres(),
+  dbname = "Movie Ratings",
+  host = "localhost",
+  port = 5432,
+  user = "postgres",
+  password = rstudioapi::askForPassword("Enter PostgreSQL password")
+)
+```
+
+Here we created an abject called **con** that will store my connection to the database, connect R to my PostgreSQL, and use the driver installed. Then connect to the database names Movie Ratings using designated port and prompt password entry as a pop-up.
+
+```{r}
+dbListTables(con)
+```
+
+```{r}
+dbname = "Movie Ratings"
+```
+
+testing the connection
+
+```{r}
+ratings_df <- dbGetQuery(
+  con,
+  "
+  SELECT
+      u.name,
+      m.title,
+      r.rating
+  FROM ratings r
+  JOIN users u
+      ON r.user_id = u.user_id
+  JOIN movies m
+      ON r.movie_id = m.movie_id
+  ORDER BY u.name, m.title;
+  "
+)
+```
+
+This creates a new data frame named ratings_df. I asked PostgreSQL to run a SQL query and send the results into R.
+
+```{r}
+ratings_df <- dbGetQuery(
+  con,
+  "
+  SELECT
+      u.name,
+      m.title,
+      r.rating
+  FROM ratings r
+  JOIN users u
+      ON r.user_id = u.user_id
+  JOIN movies m
+      ON r.movie_id = m.movie_id
+  ORDER BY u.name, m.title;
+  "
+)
+```
+
+```{r}
+dbIsValid(con)
+```
+
+Verifying the connection is still there.
+
+```{r}
+dbGetQuery(con, "SELECT * FROM users;")
+```
+
+Verified R can read my table.
+
+```{r}
+ratings_df <- dbGetQuery(
+  con,
+  "
+  SELECT
+      u.name,
+      m.title,
+      r.rating
+  FROM ratings r
+  JOIN users u
+      ON r.user_id = u.user_id
+  JOIN movies m
+      ON r.movie_id = m.movie_id
+  ORDER BY u.name, m.title;
+  "
+)
+```
+
+# Moving on to R analysis
+
+```{r}
+glimpse(ratings_df)
+```
+
+Here we are looking at the structure of ratings_df/variables.
+
+```{r}
+ratings_df |>
+  group_by(title) |>
+  summarize(
+    average_rating = mean(rating)
+  )
+```
+
+Here we are grouping all ratings by movie title, then calculate the average rating for each movie.
+
+```{r}
+ratings_df |>
+  group_by(title) |>
+  summarize(
+    number_of_ratings = n()
+  )
+```
+
+Here we are grouping the data by movie, then counting how many ratings each movie received.
+
+```{r}
+movie_summary <- ratings_df |>
+  group_by(title) |>
+  summarize(
+    average_rating = mean(rating),
+    number_of_ratings = n()
+  ) |>
+  arrange(desc(average_rating))
+
+movie_summary
+```
+
+Here we ask to group ratings by movie, calculate the average and number of ratings, then sort the movies from highest average rating to lowest.
+
+```{r}
+user_summary <- ratings_df |>
+  group_by(name) |>
+  summarize(
+    ratings_given = n(),
+    average_rating_given = mean(rating)
+  )
+
+user_summary
+```
+
+Here we group the data by person, count how many movies each person rated, and calculate their average rating.
+
+# Missing Ratings
+
+Not every participant had seen every movie. Rather than assigning a value of zero, which would incorrectly fall outside the 1–5 rating scale, unrated movies were left absent from the `ratings` table. This preserves the distinction between a low rating and a movie that was not rated.
+
+```{r}
+movie_summary <- ratings_df |>
+  group_by(title) |>
+  summarize(
+    average_rating = mean(rating),
+    number_of_ratings = n()
+  ) |>
+  arrange(desc(average_rating))
+
+movie_summary
+```
+
+```{r}
+total_possible <- 6 * 6
+
+actual_ratings <- nrow(ratings_df)
+
+missing_ratings <- total_possible - actual_ratings
+
+missing_ratings
+```
+
+```{r}
+missing_ratings <- total_possible - actual_ratings
+```
+
+Here I'm looking to perform an exploratory data analysis due to the missing ratings, observing a total of 36 possible scores and then counting how many actually exist, with result of 32.
+
+# Conclusion
+
+This assignment introduced the process of collecting data, designing a normalized relational database, querying data with SQL, importing SQL results into R, and producing summary statistics using tidyverse. The resulting dataset resembles the structure of user-item data used in recommender systems and provided practical experience integrating SQL with R.
