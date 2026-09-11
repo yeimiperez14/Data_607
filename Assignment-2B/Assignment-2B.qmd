@@ -1,0 +1,218 @@
+---
+title: "Assignment 2B: Evaluating Classification Model Performance"
+author: "Yeimi Perez"
+format: html
+execute:
+  echo: true
+---
+
+# Introduction
+
+This analysis evaluates the performance of a binary classification model using predicted probabilities of penguin sex. I will compare classification results using probability thresholds of 0.2, 0.5, and 0.8 and evaluate how changing the threshold affects the model's performance.
+
+```{r}
+library(tidyverse)
+```
+
+Here we are loading the package, which makes working with data easier, including dplyr, readr, and ggplot2.
+
+## Data import and exploration
+
+```{r}
+penguins <- read_csv(
+  "https://raw.githubusercontent.com/acatlin/data/refs/heads/master/penguin_predictions.csv"
+)
+```
+
+```{r}
+glimpse(penguins)
+```
+
+Here we are taking a look at the imported dataset, which contains 93 observations (rows) and 3 variables (columns). The `.pred_female` variable represents the model's estimated probability that a penguin belongs to the female class. For example, a `.pred_female` value of 0.94 would mean that the model estimates a 94% probability that the penguin is female.
+
+# Task 1: Null Error Rate
+
+```{r}
+penguins %>%
+  count(sex)
+```
+
+Here we are taking the penguins dataset, then counting the observations according to sex. So we have 93 total penguins with male as the majority class.
+
+```{r}
+class_counts <- penguins %>%
+  count(sex)
+
+null_error_rate <- min(class_counts$n) / sum(class_counts$n)
+
+null_error_rate
+```
+
+Here we are calulating The Null Error Rate=Minority class/Total and we are saving the counts in new object called class_counts, with 41.94%
+
+```{r}
+ggplot(penguins, aes(x = sex)) +
+  geom_bar() +
+  labs(
+    title = "Distribution of Actual Penguin Sex",
+    x = "Sex",
+    y = "Number of Penguins"
+  ) +
+  theme_minimal()
+```
+
+Here we are asking ggplot create a bar chart, to put sex on the x-axis and the number of penguins on y-axis.
+
+The dataset contains 39 female and 54 male penguins, making male the majority class. The null error rate is approximately 41.94%, meaning that a model that simply predicted every observation as male would incorrectly classify about 41.94% of the observations. This baseline is important because it provides a simple comparison for evaluating whether the classification model offers an improvement over always predicting the majority class.
+
+# Task 2: Confusion Matrices at Multiple Thresholds
+
+For this section, I will create new predicted classes using probability thresholds of 0.2, 0.5, and 0.8. I will then compare each predicted class with the actual `sex` value to determine the number of true positives, false positives, true negatives, and false negatives. Female will be treated as the positive class and male as the negative class.
+
+```{r}
+penguins_02 <- penguins %>%
+  mutate(
+    predicted_02 = ifelse(.pred_female > 0.2, "female", "male")
+  )
+
+penguins_02
+```
+
+Here we are creating a new version of our dataset and calling it penguins_02 to observe and analyze predictions at the 0.2 threshold. A condition was included that if the probability of female is \>0.2 we get a female prediction and if no, we get male. This will convert a probability into a class.
+
+```{r}
+penguins_02
+```
+
+This code creates a new predicted class using a probability threshold of 0.2. If the value of `.pred_female` is greater than 0.2, the observation is classified as female; otherwise, it is classified as male. The new `predicted_02` variable allows me to compare the model's prediction at this threshold with the actual `sex` of each penguin.
+
+## Building the confusion matrix
+
+```{r}
+confusion_02 <- table(
+  Actual = penguins_02$sex,
+  Predicted = penguins_02$predicted_02
+)
+
+confusion_02
+```
+
+Here we are comparing the actual vs predicted sex and counting every combination. At the 0.2 probability threshold, the model correctly classified 37 female penguins as female (true positives) and 48 male penguins as male (true negatives). It incorrectly classified 6 male penguins as female (false positives) and 2 female penguins as male (false negatives).
+
+Because 0.2 is a relatively low threshold, the model requires less confidence before classifying an observation as female, which results in more observations being predicted as the positive class.
+
+```{r}
+penguins_05 <- penguins %>%
+  mutate(
+    predicted_05 = ifelse(.pred_female > 0.5, "female", "male")
+  )
+
+penguins_05
+```
+
+```{r}
+confusion_05 <- table(
+  Actual = penguins_05$sex,
+  Predicted = penguins_05$predicted_05
+)
+
+confusion_05
+```
+
+At the 0.5 probability threshold, the model correctly classified 36 female penguins as female and 51 male penguins as male. It incorrectly classified 3 male penguins as female and 3 female penguins as male. Compared with the 0.2 threshold, the number of false positives decreased from 6 to 3, while the number of false negatives increased from 2 to 3. This shows that increasing the threshold makes the model more selective before classifying an observation as female.
+
+```{r}
+penguins_08 <- penguins %>%
+  mutate(
+    predicted_08 = ifelse(.pred_female > 0.8, "female", "male")
+  )
+
+penguins_08
+```
+
+```{r}
+confusion_08 <- table(
+  Actual = penguins_08$sex,
+  Predicted = penguins_08$predicted_08
+)
+
+confusion_08
+```
+
+At the 0.8 probability threshold, the model correctly classified 36 female penguins as female and 52 male penguins as male. It incorrectly classified 2 male penguins as female and 3 female penguins as male. Compared with the lower thresholds, the 0.8 threshold requires greater confidence before predicting female. This resulted in fewer false positive predictions, although some actual females were still incorrectly classified as male.
+
+## Task 3: Performance Metrics
+
+Using the values obtained from each confusion matrix, I will calculate accuracy, precision, recall, and F1 score for the 0.2, 0.5, and 0.8 thresholds. These metrics provide different ways of evaluating the model's performance and allow me to compare how changing the probability threshold affects the results.
+
+```{r}
+metrics <- tibble(
+  threshold = c(0.2, 0.5, 0.8),
+  TP = c(37, 36, 36),
+  FP = c(6, 3, 2),
+  TN = c(48, 51, 52),
+  FN = c(2, 3, 3)
+)
+
+metrics
+```
+
+Here tibble creates a small table and called it metrics, where each column stores one piece of information from the confusion matrices.
+
+For accuracy we need to check how many did the model classify correctly. Accuracy=(TP+TN)/(TP+FP+TN+FN), so the model correctly classified about 91.4% of all observations at the 0.2 threshold.
+
+For precision we need to check how many were actually female out of total predicted female. Precision= TP/(TP+FP), so of all the penguins the model called female at the 0.2 threshold, about 86.1% actually were female.
+
+For Recall, we need to check how many did the model successfully identify as female of all the penguins that were actually female. Recall=TP/(TP+FN), so the model identified approximately 94.9% of the actual females.
+
+--A useful distinction: **Precision:** When the model says **female**, how often is it right? R**ecall:** Of all the **actual females**, how many did the model find?--
+
+The F1 score combines precision and recall into one measurement. F1=2x(PrecisionxRecall/Precision+Recall).
+
+```{r}
+metrics <- metrics %>%
+  mutate(
+    accuracy = (TP + TN) / (TP + FP + TN + FN),
+    precision = TP / (TP + FP),
+    recall = TP / (TP + FN),
+    f1_score = 2 * (precision * recall) / (precision + recall)
+  )
+
+metrics
+```
+
+Here I calculated accuracy, precision, recall, and F1 score for each probability threshold using the values from the confusion matrices. Accuracy measures the proportion of all predictions that were correct. Precision measures how often the model was correct when it predicted female, while recall measures how many of the actual females the model successfully identified. The F1 score combines precision and recall into a single measure to evaluate the balance between the two.
+
+```{r}
+metrics_table <- metrics %>%
+  mutate(
+    accuracy = round(accuracy * 100, 2),
+    precision = round(precision * 100, 2),
+    recall = round(recall * 100, 2),
+    f1_score = round(f1_score * 100, 2)
+  )
+
+metrics_table
+```
+
+The results show that model performance changes as the probability threshold increases. At the 0.2 threshold, recall is highest at 94.87%, meaning this threshold identifies the greatest proportion of actual female penguins. However, its precision is lower at 86.05% because more male penguins are incorrectly classified as female.
+
+At the 0.5 threshold, accuracy and precision improve while recall decreases slightly. At the 0.8 threshold, the model achieves the highest accuracy, precision, and F1 score of the three thresholds. Precision reaches 94.74%, indicating that when the model predicts female at this higher threshold, the prediction is more likely to be correct.
+
+These results demonstrate the tradeoff created by changing the probability threshold. A lower threshold makes the model more willing to predict the positive class, which can improve recall but also increase false positives. A higher threshold makes the model more selective, which can improve precision but may increase the risk of missing positive cases.
+
+## Task 4: Threshold Use Cases
+
+- Describe at least one real-world scenario where:
+
+  - A **0.2 threshold** is preferable
+
+  - A **0.8 threshold** is preferable
+
+### 0.2 Threshold
+
+A lower threshold such as 0.2 could be useful in a healthcare setting when identifying patients who may be at risk for medication nonadherence and should receive additional review or outreach. With a lower threshold, the model would flag more patients as potentially at risk, including patients for whom the model has less certainty. In this situation, missing a patient who actually needs intervention may be more concerning than conducting an additional review or outreach for someone who does not. Therefore, a lower threshold may be preferred when identifying as many true positive cases as possible is important. This is reflected in the current analysis, where the 0.2 threshold produced the highest recall at 94.87%.
+
+### 0.8 Threshold
+
+A higher threshold such as 0.8 could be preferable when a positive prediction could result in a significant action and false positives need to be minimized. For example, if a healthcare model were used to identify potentially fraudulent claims for automatic denial, a higher threshold could require the model to have greater confidence before classifying a claim as potentially fraudulent. Incorrectly denying a legitimate claim could negatively affect both patients and providers. In this type of situation, higher precision may be more important because we want positive predictions to be highly reliable. In the current analysis, the 0.8 threshold produced the highest precision at 94.74%.
