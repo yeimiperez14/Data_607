@@ -1,0 +1,145 @@
+---
+title: "Assignment 3A: Global Baseline Estimate"
+Author: Yeimi Perez
+format: html
+
+execute:
+  echo: true
+  output: true
+  warning: false
+  message: false
+---
+
+# Approach
+
+For this assignment, I will use the movie rating survey data collected in the previous assignment to create a recommendation using the Global Baseline Estimate method. Rather than calculating recommendations for every user and every unrated movie, I will focus on one selected rater and one movie that the person has not rated.
+
+My approach will be to first calculate the overall average rating across the movie dataset. I will then calculate the selected user's average rating and the selected movie's average rating. From these values, I will determine the user bias and movie bias and apply the Global Baseline Estimate formula provided in the assignment spreadsheet. One challenge I anticipate is making sure that missing ratings are not included when calculating the averages. I will also need to make sure that I correctly match the selected user's ratings and the selected movie's ratings before calculating the biases.
+
+# Introduction
+
+The purpose of this assignment is to use movie rating data to create a recommendation using the Global Baseline Estimate method. This method uses the overall average rating, along with user and movie rating patterns, to estimate how a user may rate a movie they have not yet rated. For this assignment, I will focus on one selected user and one unrated movie.
+
+```{r}
+ratings <- data.frame(
+  user_id = c(
+    1,1,1,1,1,1,
+    2,2,2,2,
+    3,3,
+    4,4,4,
+    5,5,5,
+    6,6,6,6
+  ),
+  
+  movie_id = c(
+    1,2,3,4,5,6,
+    1,2,3,5,
+    1,4,
+    2,3,4,
+    1,3,4,
+    3,4,5,6
+  ),
+  
+  rating = c(
+    5,4,5,4,4,5,
+    4,4,4,5,
+    5,5,
+    5,4,4,
+    4,5,4,
+    4,5,4,5
+  )
+)
+
+ratings
+```
+
+ratingsuser_id = which person gave the rating
+
+movie_id = which movie they rated
+
+rating = their score
+
+- 
+
+  ### Calculating the Global Average 
+
+```{r}
+global_mean <- mean(ratings$rating)
+
+global_mean
+```
+
+### Calculating average for Eduard
+
+```{r}
+eduard_ratings <- ratings[
+  ratings$user_id == 2,
+]
+
+eduard_ratings
+```
+
+```{r}
+eduard_average <- mean(eduard_ratings$rating)
+
+eduard_average
+```
+
+### Calculating Eduard's user bias
+
+```{r}
+eduard_bias <- eduard_average - global_mean
+
+eduard_bias
+```
+
+This means that Eduard tends to rate movies slightly lower than the overall dataset average.
+
+### Calculating Movie 6' average: **Lion King II: Simba’s Pride**.
+
+```{r}
+movie6_ratings <- ratings[
+  ratings$movie_id == 6,
+]
+
+movie6_ratings
+```
+
+Here we isolate everyone who rated movie 6,
+
+```{r}
+movie6_average <- mean(movie6_ratings$rating)
+
+movie6_average
+```
+
+and we calculate the mean from the two users who rated.
+
+### Calculating Movie's 6 bias
+
+```{r}
+movie6_bias <- movie6_average - global_mean
+
+movie6_bias
+```
+
+This means that Movie 6 tends to receive higher ratings than the overall dataset average.
+
+### Calculating the Global Baseline Estimate
+
+```{r}
+prediction <- global_mean +
+  eduard_bias +
+  movie6_bias
+
+prediction
+round(prediction, 2)
+```
+
+This means that Eduard would rate Lion King II: Simba’s Pride approximately 4.8 out of 5.
+
+# Conclusion
+
+For this assignment, I used the Global Baseline Estimate method to predict a rating for one user and one movie that had not been rated. I first calculated the overall average rating, then the selected user's average and bias, followed by the selected movie's average and bias. Using these values, I calculated the predicted rating with the Global Baseline Estimate formula.
+
+The final predicted rating was approximately **4.80 out of 5**. Based on this estimate, the selected movie would be a strong recommendation for this user.
