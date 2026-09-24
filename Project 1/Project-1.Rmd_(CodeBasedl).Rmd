@@ -1,0 +1,327 @@
+---
+title: "DATA 607 - Project 1"
+author: "Yeimi Perez"
+output: html_document
+---
+
+# Approach
+
+For Project 1, I will work with the provided chess tournament cross-table text file and transform the semi-structured data into a clean dataset using R. The final dataset will contain each player's name, state, total points, pre-tournament rating, and average pre-tournament rating of the opponents they played. My plan is to first import the text file and identify the repeating structure of the tournament results. I will then extract the player information and opponent numbers, match the opponent numbers back to the appropriate players and ratings, and calculate the average opponent rating for each player.
+
+One challenge I anticipate is that the original dataset is not organized like a traditional spreadsheet. Each player's information is spread across two lines, and the round results contain both game outcomes and opponent numbers. I will need to clean and restructure these fields carefully before creating the final dataset and exporting it as a CSV file.
+
+# Introduction
+
+The purpose of Project 1 is to practice cleaning and transforming semi-structured data using R. Using chess tournament results, I will extract each player’s name, state, total points, and pre-tournament rating, then calculate the average pre-tournament rating of their opponents. The final cleaned dataset will be organized and exported as a CSV file for further analysis or database use.
+
+# Code Base
+
+The chess tournament data is stored in a semi-structured text format rather than a traditional rectangular dataset. I will first import the raw text and inspect its structure before extracting the player information needed for the final dataset. Then we want to see the first several lines of the tournament file for inspection.
+
+```{r}
+data_url <- "https://raw.githubusercontent.com/yeimiperez14/Data_607/refs/heads/main/Project%201/tournamentinfo.txt"
+
+chess_raw <- readLines(data_url, warn = FALSE)
+```
+```{r}
+head(chess_raw, 20)
+```
+
+## Identify Player Records
+
+The tournament file contains several types of rows, including headers, separator lines, player result rows, and player detail rows. The player result rows begin with a numerical player number, so I will use that pattern to identify them.
+
+```{r}
+player_rows <- chess_raw[
+  grepl("^\\s*[0-9]+\\s*\\|", chess_raw)
+]
+
+head(player_rows)
+```
+grepl() searches each line of the text file for a particular pattern: 
+^\\s*[0-9]+\\s*\\| means ^ (start of the line),\\s (allow spaces), [0-9]+ (look for one or more numbers), and \\| (look for the pipe symbol). The matching rows are saved as player_rows.
+
+# Checking the Rows Found
+
+I check the number of player rows that were identified to make sure the extraction step returned a reasonable number of records before continuing.
+
+```{r}
+length(player_rows)
+```
+This gives us the number of player records identified and stored in player_rows.
+
+# Separating the Player Rows into Separate Fields
+
+Each player row contains several pieces of information separated by the pipe symbol. I split each row at the pipe separators so that the player number, name, points, and round results can be accessed individually.
+
+```{r}
+player_parts <- strsplit(player_rows, "\\|")
+```
+strsplit() splits text into separate pieces and the | separator in the tournament file adds individual seprated fields that get stored in player_parts.
+
+# Extracting the Player Numner
+
+The first field of each player row contains the player's tournament number. I extract this value because the player number will later be used to connect each opponent number with that opponent's pre-tournament rating.
+
+```{r}
+player_number <- sapply(
+  player_parts,
+  function(x) as.integer(trimws(x[1]))
+)
+
+head(player_number)
+```
+sapply() applies the same operation to every player's row, selects the first field x[1], removes unnecessary spaces trimws(), and onverts the player number from text into an integer as.integer().
+
+#Extracting Player Names
+
+The second field of each player row contains the player's name. I extract the second field and remove extra spaces so that each player name is stored cleanly.
+
+```{r}
+player_name <- sapply(
+  player_parts,
+  function(x) trimws(x[2])
+)
+
+head(player_name)
+```
+
+#Extracting Total Tournament Points
+
+The third field contains the player's total tournament points. I extract this field and convert it to numeric format so the values can be treated as numbers rather than text.
+
+```{r}
+total_points <- sapply(
+  player_parts,
+  function(x) as.numeric(trimws(x[3]))
+)
+
+head(total_points)
+```
+This selects the third field from each player's row that contains values like 6.0 and converts those values into numeric data, so that we can quantify.
+
+# Identifying The Detail Rows
+
+## Extracting State and Pre-Tournament Rating
+
+The tournament file stores additional information for each player on a second line. These detail rows begin with a two-letter state abbreviation followed by a pipe symbol. I identify these rows separately so that the state and pre-tournament rating can be extracted.
+
+```{r}
+detail_rows <- chess_raw[
+  grepl("^\\s*[A-Z]{2}\\s*\\|", chess_raw)
+]
+
+head(detail_rows)
+```
+# Splitting the Detail Rows
+
+The detail rows also use pipe symbols to separate information. I split these rows into individual fields so that the state and rating information can be extracted separately.
+
+```{r}
+detail_parts <- strsplit(detail_rows, "\\|")
+```
+
+# Extracting Player State
+
+The first field of each detail row contains the player's state or regional abbreviation. I extract this field and remove any extra spaces.
+
+```{r}
+player_state <- sapply(
+  detail_parts,
+  function(x) trimws(x[1])
+)
+
+head(player_state)
+```
+
+# Isolating the Rating Field
+
+The second field of the detail row contains several values, including a player ID, the pre-tournament rating, and the post-tournament rating. I first isolate this field before extracting only the pre-tournament rating.
+
+```{r}
+rating_field <- sapply(
+  detail_parts,
+  function(x) trimws(x[2])
+)
+
+head(rating_field)
+```
+This extracts the second section from every detail row.
+
+# Extracting the pre-tournament Rating
+
+The pre-tournament rating appears after the text `R:` in the rating field. I use a regular expression to capture the number immediately following `R:` and convert it to numeric format.
+
+```{r}
+pre_rating <- as.numeric(
+  sub(
+    ".*R:\\s*([0-9]+).*",
+    "\\1",
+    rating_field
+  )
+)
+
+head(pre_rating)
+```
+sub() searches text for a pattern and replaces it, that captures numbers after R, and turns it into a number.
+
+# Creating the initial player Table
+
+I'll combine the information extracted so far into a structured data frame. At this stage, the table contains the player's tournament number, name, state, total points, and pre-tournament rating.
+
+```{r}
+players <- data.frame(
+  player_number,
+  player_name,
+  player_state,
+  total_points,
+  pre_rating
+)
+
+head(players)
+```
+data.frame() takes the separate vectors created and combines them in one rectangular dataset.
+
+# Creating a Function to Extract Opponent numbers
+
+## Extracting Opponent Information
+
+Each tournament round contains a result followed by the opponent's player number. For example, `W 39` indicates that the player won against player number 39. I create a function that extracts the numerical opponent IDs from all of the round fields for each player.
+
+```{r}
+extract_opponents <- function(x) {
+
+  fields <- strsplit(x, "\\|")[[1]]
+
+  round_fields <- fields[4:length(fields)]
+
+  opponent_numbers <- sapply(
+    round_fields,
+    function(field) {
+
+      match_value <- regmatches(
+        field,
+        regexpr("[0-9]+", field)
+      )
+
+      if (length(match_value) == 0 || match_value == "") {
+        NA
+      } else {
+        as.integer(match_value)
+      }
+    }
+  )
+
+  opponent_numbers[!is.na(opponent_numbers)]
+}
+```
+
+strsplit(x, "\\|") splits one player's row into its fields, then fields[4:length(fields)] selects the tournament round information because the first three fields contain player number/name/total points. regexpr("[0-9]+", field) looks for a number in each row and !is.na() removed missing values. 
+
+#
+Before applying the function to every player, we can test it using the first player, Gary Hua. This allows me to verify that the opponent numbers are being extracted correctly.
+
+```{r}
+gary_opponents <- extract_opponents(player_rows[1])
+
+gary_opponents
+```
+player_rows[1] selects the first player's row.
+
+# Matching Gary Hua's opponents to their pre-ratings
+
+The opponent numbers identify players rather than ratings. I'll therefore match each opponent number to the corresponding player number in the player table and retrieve that opponent's pre-tournament rating.
+
+```{r}
+gary_ratings <- players$pre_rating[
+  match(gary_opponents, players$player_number)
+]
+
+gary_ratings
+```
+match() finds where each opponent number appears in players$player_number.
+
+# Calculating Gary Hua's Average Opponent Rating
+
+I'll calculate the average of Gary Hua's opponents' pre-tournament ratings as a validation step. The project instructions state that Gary's average should equal 1605, so this provides a useful check that the extraction and matching process is working correctly.
+
+```{r}
+round(mean(gary_ratings, na.rm = TRUE))
+```
+
+# Calculating the Opponent Average for every player
+
+After confirming that the calculation works for the first player, I'll apply the same process to every player in the tournament. For each player, the code extracts the opponent numbers, matches those opponents to their pre-tournament ratings, and calculates the rounded average.
+
+```{r}
+average_opponent_rating <- sapply(
+  player_rows,
+  function(row) {
+
+    opponents <- extract_opponents(row)
+
+    opponent_ratings <- players$pre_rating[
+      match(opponents, players$player_number)
+    ]
+
+    round(mean(opponent_ratings, na.rm = TRUE))
+  }
+)
+
+head(average_opponent_rating)
+```
+sapply() repeats the same process for every player and produces one average opponent rating for every player.
+
+# Final Dataset
+
+## Creating the Final Dataset
+
+I'll combine the required variables into the final dataset. The project requires Player Name, State, Total Points, Pre-Rating, and Average Pre Chess Rating of Opponents.
+
+```{r}
+final_chess_data <- data.frame(
+  Player_Name = player_name,
+  State = player_state,
+  Total_Points = total_points,
+  Pre_Rating = pre_rating,
+  Average_Opponent_Pre_Rating = average_opponent_rating
+)
+
+head(final_chess_data)
+```
+Before exporting the data, I'll perform basic checks on the final dataset to confirm its dimensions, review the values, and identify any missing observations.
+
+```{r}
+dim(final_chess_data)
+
+summary(final_chess_data)
+
+sum(is.na(final_chess_data))
+```
+# Exporting the CSV
+
+The final requirement is to generate a CSV file containing the cleaned player information. I export the completed data frame without R row numbers so the resulting file contains only the required variables. Then I verified that the CSV file was successfully successfully created and then read it back into R to confirm that the exported data can be accessed correctly.
+
+```{r}
+write.csv(
+  final_chess_data,
+  "chess_players_final.csv",
+  row.names = FALSE
+)
+```
+
+```{r}
+file.exists("chess_players_final.csv")
+
+csv_check <- read.csv("chess_players_final.csv")
+
+head(csv_check)
+```
+
+```{r}
+write.csv(
+  final_chess_data,
+  "chess_players_final.csv",
+  row.names = FALSE
+)
+```
