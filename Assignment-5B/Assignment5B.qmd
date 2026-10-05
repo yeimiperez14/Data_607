@@ -1,0 +1,454 @@
+---
+title: "Assignment 5B: ELO Calculations"
+author: "Yeimi Perez"
+format: 
+  html:
+    code-fold: false
+    toc: true
+---
+
+# Approach
+
+I will use the cleaned chess tournament data from Project 1 and compare each player's pre-tournament rating with the ratings of their opponents. For each matchup, I will calculate the player's expected Elo score and then add the expected scores across all games, to then compare the total expected score with the player's actual tournament points. Finally, I will sort the differences to identify the five players who most overperformed and the five players who most underperformed expectations.
+
+# Introduction
+
+This assignment builds on the chess tournament data used in Project 1. The goal is to calculate each player's expected tournament score using the Elo rating system and compare it with the player's actual tournament points. The difference between actual and expected performance will then be used to identify the five players who most over-performed and the five players who most under-performed.
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+tournament_url <- "https://raw.githubusercontent.com/yeimiperez14/Data_607/main/Project%201/tournamentinfo.txt"
+
+tournament_lines <- readLines(tournament_url)
+```
+
+```{r}
+head(tournament_lines, 10)
+```
+
+Here we imported the tournament file from github and checked the import.
+
+#### Extracting the Player Results Only
+
+```{r}
+player_lines <- tournament_lines[
+  str_detect(tournament_lines, "^\\s*\\d+\\s*\\|")
+]
+```
+
+```{r}
+head(player_lines)
+```
+
+```{r}
+length(player_lines)
+```
+
+This pattern `^\s\d+\s\|` find lines that begin with a number followed by `|.` We then confirmed we have all 64 players.
+
+#### Separating Each Player into Separate Pieces
+
+```{r}
+player_split <- str_split_fixed(
+  player_lines,
+  "\\|",
+  n = 11
+)
+```
+
+Here we separate information and split into for each player.
+
+#### Creating the Player Table
+
+```{r}
+players <- tibble(
+  player_number = as.numeric(str_trim(player_split[, 1])),
+  player_name = str_trim(player_split[, 2]),
+  total_points = as.numeric(str_trim(player_split[, 3])),
+  round1 = str_trim(player_split[, 4]),
+  round2 = str_trim(player_split[, 5]),
+  round3 = str_trim(player_split[, 6]),
+  round4 = str_trim(player_split[, 7]),
+  round5 = str_trim(player_split[, 8]),
+  round6 = str_trim(player_split[, 9]),
+  round7 = str_trim(player_split[, 10])
+)
+```
+
+```{r}
+names(players)
+```
+
+```{r}
+dim(players)
+names(players)
+```
+
+```{r}
+head(players)
+```
+
+#### Extracting the Rating Lines
+
+```{r}
+rating_lines <- tournament_lines[
+  str_detect(tournament_lines, "^\\s*[A-Z]{2}\\s*\\|")
+]
+```
+
+```{r}
+head(rating_lines)
+```
+
+#### Extracting each player's rating
+
+```{r}
+ratings <- tibble(
+  player_number = 1:length(rating_lines),
+  pre_rating = as.numeric(
+    str_match(rating_lines, "R:\\s*(\\d+)")[, 2]
+  )
+)
+```
+
+```{r}
+head(ratings)
+```
+
+These are the pre-tournament ratings shown in the source.
+
+#### Bringing together the Ratings to the Player Table
+
+```{r}
+players <- players %>%
+  left_join(
+    ratings,
+    by = "player_number"
+  )
+```
+
+```{r}
+head(players)
+```
+
+```{r}
+players %>%
+  filter(player_name == "GARY HUA")
+```
+
+#### Changing the 7 round columns into rows
+
+```{r}
+games <- players %>%
+  pivot_longer(
+    cols = round1:round7,
+    names_to = "round",
+    values_to = "round_result"
+  )
+```
+
+```{r}
+head(games, 10)
+```
+
+#### Extract the result code
+
+```{r}
+games <- games %>%
+  mutate(
+    result_code = str_extract(
+      round_result,
+      "^[A-Z]"
+    )
+  )
+```
+
+```{r}
+head(games)
+```
+
+#### Extracting the opponents number
+
+```{r}
+games <- games %>%
+  mutate(
+    opponent_number = as.numeric(
+      str_extract(round_result, "\\d+")
+    )
+  )
+```
+
+```{r}
+head(games)
+```
+
+Remove rounds without an Opponent
+
+```{r}
+played_games <- games %>%
+  filter(!is.na(opponent_number))
+```
+
+Those rounds do not contain an opponent number, so there is no opponent rating available for an Elo calculation.
+
+#### Checking the Matchup Table
+
+```{r}
+played_games %>%
+  select(
+    player_name,
+    pre_rating,
+    round,
+    round_result,
+    opponent_number
+  ) %>%
+  head(15)
+```
+
+#### Creating an opponent rating lookup table
+
+```{r}
+rating_lookup <- players %>%
+  select(
+    opponent_number = player_number,
+    opponent_rating = pre_rating
+  )
+```
+
+```{r}
+head(rating_lookup)
+```
+
+#### Attaching the Opponents Ratings
+
+```{r}
+played_games <- played_games %>%
+  left_join(
+    rating_lookup,
+    by = "opponent_number"
+  )
+```
+
+```{r}
+played_games %>%
+  select(
+    player_name,
+    pre_rating,
+    opponent_number,
+    opponent_rating
+  ) %>%
+  head(15)
+```
+
+#### Making sure every opponent got a rating
+
+```{r}
+sum(is.na(played_games$opponent_rating))
+```
+
+`0` means every opponent number successfully matched a player rating.
+
+#### Planning on the Elo formula
+
+\# source: <https://handbook.fide.com/chapter/B022017>
+
+1 / (1 + 10\^((opponent_rating - pre_rating) / 400))
+
+#### Testing the Formula on Gary Hua's first opponent
+
+```{r}
+gary_expected <- 1 / (
+  1 + 10^((1436 - 1794) / 400)
+)
+
+gary_expected
+```
+
+#### Calculating Elo expectation for every matchup
+
+```{r}
+played_games <- played_games %>%
+  mutate(
+    expected_score =
+      1 / (
+        1 + 10^(
+          (opponent_rating - pre_rating) / 400
+        )
+      )
+  )
+```
+
+```{r}
+played_games %>%
+  select(
+    player_name,
+    pre_rating,
+    opponent_rating,
+    expected_score
+  ) %>%
+  head(15)
+```
+
+#### Adding the expected scores for each Player
+
+```{r}
+expected_totals <- played_games %>%
+  group_by(
+    player_number,
+    player_name
+  ) %>%
+  summarise(
+    expected_score = sum(expected_score),
+    .groups = "drop"
+  )
+```
+
+```{r}
+head(expected_totals)
+```
+
+#### Bringing back the actual tournament score
+
+Joining it:
+
+```{r}
+actual_scores <- players %>%
+  select(
+    player_number,
+    total_points
+  )
+```
+
+```{r}
+player_results <- expected_totals %>%
+  left_join(
+    actual_scores,
+    by = "player_number"
+  )
+```
+
+renaming it:
+
+```{r}
+player_results <- player_results %>%
+  rename(
+    actual_score = total_points
+  )
+```
+
+and checking:
+
+```{r}
+head(player_results)
+```
+
+I am using `total_points` here because the assignment asks to compare expected score with the player's actual tournament score.
+
+Some players have special rounds such as `B` or `H`, for which there is no rated opponent. Those rounds therefore do not generate an Elo expected value, as that limitation comes from the structure of the tournament file itself.
+
+### Calculating performance difference
+
+```{r}
+player_results <- player_results %>%
+  mutate(
+    performance_difference =
+      actual_score - expected_score
+  )
+```
+
+```{r}
+head(player_results)
+```
+
+A positive difference means that the player over-performed and a negative difference that they under-performed.
+
+#### Rounding the results
+
+```{r}
+player_results <- player_results %>%
+  mutate(
+    expected_score =
+      round(expected_score, 2),
+    
+    performance_difference =
+      round(performance_difference, 2)
+  )
+```
+
+#### The 5 greatest over-performers
+
+```{r}
+top_overperformers <- player_results %>%
+  arrange(
+    desc(performance_difference)
+  ) %>%
+  slice_head(n = 5)
+```
+
+```{r}
+top_overperformers
+```
+
+#### The 5 greatest under-performers
+
+```{r}
+top_underperformers <- player_results %>%
+  arrange(
+    performance_difference
+  ) %>%
+  slice_head(n = 5)
+```
+
+```{r}
+top_underperformers
+```
+
+#### Cleaning the final tables
+
+For over-performers
+
+```{r}
+top_overperformers %>%
+  select(
+    player_name,
+    actual_score,
+    expected_score,
+    performance_difference
+  )
+```
+
+For under-performers
+
+```{r}
+top_underperformers %>%
+  select(
+    player_name,
+    actual_score,
+    expected_score,
+    performance_difference
+  )
+```
+
+### Reviewing the entire ranking
+
+```{r}
+player_results %>%
+  arrange(
+    desc(performance_difference)
+  )
+```
+
+Checking the number of players
+
+```{r}
+nrow(player_results)
+```
+
+The performance difference was calculated by subtracting each player's Elo expected score from the player's actual tournament score. Positive differences indicate that the player scored more points than expected based on the ratings of their opponents, while negative differences indicate that the player scored fewer points than expected.
+
+# Conclusion
+
+The Elo calculations provided a way to compare each player's actual tournament performance with the performance expected from the rating differences between the player and their opponents. After calculating and summing the expected scores, the difference between actual and expected performance was used to identify the five greatest over-performers and five greatest underperformers in the tournament.
