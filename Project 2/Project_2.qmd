@@ -1,0 +1,661 @@
+---
+title: "Project 2 - Data Tidying and Transformation"
+author: "Yeimi Perez"
+date: today
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: flatly
+execute:
+  echo: true
+  warning: false
+---
+
+# Approach
+
+For Project 2, I will work with three separate wide-format datasets selected from the Week 5 Discussion 5A options. My goal will be to preserve each dataset in its original wide format first and then use R, mainly the tidyr and dplyr packages, to transform each dataset into a tidy format that is easier to analyze. For each dataset, I will examine the original structure, identify the columns that need to be reorganized, rename variables when necessary, and address missing or inconsistent values. I will document the transformation process so that each step can be reproduced from the original raw data.
+
+Some challenges I expect include determining the correct variables to keep as identifiers, deciding which columns should be pivoted from wide to long format, and handling missing or inconsistently formatted values without losing important information. I will use summary tables and visualizations when appropriate and will explain the results for each dataset in context.
+
+# Introduction
+
+The purpose of this project is to practice cleaning, tidying, transforming, and analyzing three different wide-format datasets. The datasets include U.S. average tuition by state, population estimates for the ten most populous U.S. states, and World Bank life expectancy data. Although the datasets cover different topics, each provides an opportunity to transform data from a wide structure into a tidy format that is easier to analyze.
+
+For each dataset, I will first examine the original structure, then use functions from tidyr and dplyr to reshape and clean the data. After the transformation is complete, I will use the tidy data to create summary statistics and visualizations. This process demonstrates how data preparation can make different types of datasets more useful for analysis.
+
+```{r}
+library(tidyverse)
+library(readr)
+```
+
+## Dataset 1 \| U.S. Average Tuition
+
+```{r}
+tuition_url <- "https://raw.githubusercontent.com/yeimiperez14/Data_607/refs/heads/main/Project%202/us_avg_tuition(Table%205).csv"
+
+tuition_raw <- read_csv(tuition_url)
+```
+
+The first dataset contains average tuition information for U.S. states across multiple academic years. The original dataset was obtained from other student, Mubin Ejaz, on 5A discussion and was saved as a CSV file on my github in its original wide format: [https://github.com/yeimiperez14/Data_607/tree/main/Project%202.](https://github.com/yeimiperez14/Data_607/tree/main/Project%202)
+
+### Data structure before Tidying
+
+```{r}
+dim(tuition_raw)
+names(tuition_raw)
+glimpse(tuition_raw)
+```
+
+We have 50 rows and 13 columns. Each row represents a state, while each academic year is stored in a separate column. The dataset is therefore in wide format because academic year is represented across multiple columns instead of being stored as one variable. The tuition columns were also imported as character values and will need to be converted to numeric values before analysis.
+
+### Transformation steps
+
+```{r}
+tuition_long <- tuition_raw %>%
+  pivot_longer(
+    cols = -State,
+    names_to = "academic_year",
+    values_to = "tuition"
+  )
+
+head(tuition_long)
+```
+
+I transformed every column except state and placed the old year column names and corresponding tuition amount into one variable.
+
+### Cleaning the variables
+
+```{r}
+tuition_tidy <- tuition_long %>% rename( state = State ) %>% mutate( tuition = parse_number(tuition) )
+```
+
+Tuition was imported as character/text. We need numeric values before calculating means.
+
+### Addressing missing values
+
+```{r}
+colSums(is.na(tuition_tidy))
+```
+
+No missing values were identified, so no observations needed to be removed.
+
+### Analysis
+
+```{r}
+tuition_summary <- tuition_tidy %>%
+  group_by(academic_year) %>%
+  summarise(
+    average_tuition = mean(tuition, na.rm = TRUE)
+  )
+
+tuition_summary
+```
+
+`group_by(academic_year)` organizes the observations by year, `summarise()` creates one result for each academic year, `mean()` calculates average tuition across states and `na.rm = TRUE` prevents missing tuition values from breaking the calculation.
+
+### Visualization
+
+```{r}
+ggplot(
+  tuition_summary,
+  aes(
+    x = academic_year,
+    y = average_tuition,
+    group = 1
+  )
+) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Average U.S. Tuition by Academic Year",
+    x = "Academic Year",
+    y = "Average Tuition ($)"
+  ) +
+  scale_y_continuous(
+    labels = scales::dollar_format()
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
+  )
+```
+
+### Interpretation
+
+The results show a consistent increase in average U.S. tuition over the academic years analyzed. Average tuition increased from approximately **\$6,410 in 2004–05 to \$8,948 in 2013–14**, an increase of about **\$2,538**. The largest increases appear in the later years of the dataset, particularly between 2008–09 and 2012–13. Overall, the analysis shows a clear upward trend in average tuition over time.
+
+```{r}
+highest_tuition <- tuition_tidy %>%
+  arrange(desc(tuition)) %>%
+  select(state, academic_year, tuition) %>%
+  slice(1)
+
+highest_tuition
+```
+
+```{r}
+tuition_change <- tuition_tidy %>%
+  group_by(state) %>%
+  summarise(
+    starting_tuition = first(tuition),
+    ending_tuition = last(tuition),
+    tuition_change = ending_tuition - starting_tuition
+  )
+
+tuition_change
+```
+
+### Classifying the direction of change
+
+```{r}
+tuition_change <- tuition_change %>%
+  mutate(
+    trend = case_when(
+      tuition_change > 0 ~ "Lower to Higher",
+      tuition_change < 0 ~ "Higher to Lower",
+      TRUE ~ "No Change"
+    )
+  )
+
+tuition_change
+```
+
+### Which state increased the most
+
+```{r}
+tuition_change %>%
+  arrange(desc(tuition_change)) %>%
+  head(10)
+```
+
+### Which one decreased the most
+
+```{r}
+tuition_change %>%
+  filter(tuition_change < 0) %>%
+  arrange(tuition_change)
+```
+
+```{r}
+tuition_change %>%
+  count(trend)
+```
+
+### Visualization
+
+```{r}
+#| fig-height: 12
+#| fig-width: 9
+
+ggplot(
+  tuition_change,
+  aes(
+    x = tuition_change,
+    y = reorder(state, tuition_change)
+  )
+) +
+  geom_col() +
+  scale_x_continuous(
+    labels = scales::dollar_format()
+  ) +
+  labs(
+    title = "Change in Average Tuition by State",
+    subtitle = "2004-05 to 2015-16",
+    x = "Change in Tuition ($)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 8),
+    plot.title = element_text(size = 16),
+    plot.subtitle = element_text(size = 11)
+  )
+```
+
+```{r}
+top_10_tuition_change <- tuition_change %>%
+  arrange(desc(tuition_change)) %>%
+  slice_head(n = 10)
+
+ggplot(
+  top_10_tuition_change,
+  aes(
+    x = tuition_change,
+    y = reorder(state, tuition_change)
+  )
+) +
+  geom_col() +
+  scale_x_continuous(
+    labels = scales::dollar_format()
+  ) +
+  labs(
+    title = "Top 10 States with the Largest Tuition Increases",
+    subtitle = "2004-05 to 2015-16",
+    x = "Increase in Tuition ($)",
+    y = "State"
+  ) +
+  theme_minimal()
+```
+
+This part sorts the states by `tuition_change` and keeps only the 10 largest increases. The graph then compares those 10 states rather than trying to squeeze all 50 state names into one figure.
+
+### Interpretation
+
+The results show that tuition increased substantially in several states between 2004–05 and 2015–16. Hawaii had the largest increase, rising from **\$4,267 to \$10,175**, an increase of **\$5,908**. Arizona had the second-largest increase at **\$5,508**, followed by Colorado at **\$5,044** and Illinois at **\$5,006**. All 10 states with the largest changes showed a lower-to-higher tuition trend over the period.
+
+## Dataset 2 \| Census top 10 States
+
+```{r}
+population_url <- "https://raw.githubusercontent.com/yeimiperez14/Data_607/refs/heads/main/Project%202/census_top10_states_2022_untidy.csv"
+
+population_raw <- read_csv(population_url)
+
+
+```
+
+This dataset contains population estimates for the 10 most populous U.S. states. It includes each state's rank and geographic area, along with population estimates for April 1, 2020, July 1, 2021, and July 1, 2022. The population dates are stored in separate columns, making this a wide-format dataset that can be transformed into a tidy long format for analysis. The original dataset was obtained from other student, Anastasia Gmyrina, on 5A discussion and was saved as a CSV file on my github in its original wide format: [https://github.com/yeimiperez14/Data_607/tree/main/Project%202.](https://github.com/yeimiperez14/Data_607/tree/main/Project%202)
+
+### Data structure before tidying
+
+```{r}
+dim(population_raw)
+names(population_raw)
+head(population_raw)
+glimpse(population_raw)
+```
+
+```{r}
+names(population_raw)
+```
+
+### Transformation steps
+
+```{r}
+population_long <- population_raw %>%
+  pivot_longer(
+    cols = c(
+      `April 1, 2020 (Estimates Base)`,
+      `July 1, 2021`,
+      `July 1, 2022`
+    ),
+    names_to = "population_date",
+    values_to = "population"
+  )
+
+head(population_long)
+```
+
+Before, one state occupied one row, with three different population columns. After `pivot_longer()`, each state will have three rows
+
+I stored population as a number.
+
+```{r}
+population_tidy <- population_long %>%
+  rename(
+    rank = Rank,
+    state = `Geographic Area`
+  )
+
+names(population_tidy)
+```
+
+```{r}
+population_tidy <- population_tidy %>%
+  mutate(
+    population = parse_number(as.character(population))
+  )
+```
+
+```{r}
+glimpse(population_tidy)
+head(population_tidy)
+```
+
+### Addressing missing values
+
+```{r}
+colSums(is.na(population_tidy))
+```
+
+No missing values identified.
+
+### Analysis
+
+```{r}
+population_change <- population_tidy %>%
+  filter(
+    population_date %in% c(
+      "April 1, 2020 (Estimates Base)",
+      "July 1, 2022"
+    )
+  ) %>%
+  select(state, population_date, population) %>%
+  pivot_wider(
+    names_from = population_date,
+    values_from = population
+  )
+
+population_change
+```
+
+I compared each state's 2020 population estimate
+with its 2022 population estimate. I calculated both the numerical change and
+the percentage change to determine which states gained or lost population.
+
+```{r}
+population_change <- population_change %>%
+  mutate(
+    population_change =
+      `July 1, 2022` - `April 1, 2020 (Estimates Base)`,
+    
+    percent_change =
+      (population_change / `April 1, 2020 (Estimates Base)`) * 100
+  )
+
+population_change
+```
+
+A positive percentage means the state's population increased. A negative percentage means it decreased.
+
+```{r}
+population_change <- population_change %>%
+  mutate(
+    population_trend = case_when(
+      percent_change > 0 ~ "Population Gain",
+      percent_change < 0 ~ "Population Loss",
+      TRUE ~ "No Change"
+    )
+  )
+
+population_change
+```
+
+Added population trend label
+
+```{r}
+population_change %>%
+  arrange(desc(percent_change))
+```
+
+Sorted by percentage change
+
+### Visualization
+
+```{r}
+ggplot(
+  population_change,
+  aes(
+    x = percent_change,
+    y = reorder(state, percent_change)
+  )
+) +
+  geom_col() +
+  geom_vline(
+    xintercept = 0,
+    linetype = "dashed"
+  ) +
+  labs(
+    title = "Population Change in the\n10 Most Populous U.S. States",
+    subtitle = "2020 to 2022",
+    x = "Population Change (%)",
+    y = "State"
+  ) +
+  scale_x_continuous(
+    labels = scales::label_number(
+      accuracy = 0.1,
+      suffix = "%"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(
+      size = 16,
+      face = "bold"
+    ),
+    plot.subtitle = element_text(
+      size = 11
+    ),
+    axis.title = element_text(
+      size = 11
+    ),
+    axis.text = element_text(
+      size = 10
+    )
+  )
+```
+
+```{r}
+population_summary <- population_change %>%
+  select(
+    state,
+    population_change,
+    percent_change,
+    population_trend
+  ) %>%
+  mutate(
+    percent_change = round(percent_change, 2)
+  ) %>%
+  arrange(desc(percent_change))
+
+population_summary
+```
+
+### Interpretation
+
+From 2020 to 2022, four of the 10 states experienced population growth, while six experienced population loss. Florida had the largest percentage increase at approximately 3.28%, followed by Texas at 3.03%, North Carolina at 2.49%, and Georgia at 1.88%. New York experienced the largest percentage decline at approximately 2.59%, followed by Illinois at 1.80% and California at 1.29%. In terms of the number of residents, Texas had the largest population gain with approximately 884,144 additional residents, while New York had the largest population loss with approximately 524,079 fewer residents.
+
+## Dataset 3 \| World Bank life Expectancy
+
+```{r}
+life_url <- "https://raw.githubusercontent.com/yeimiperez14/Data_607/refs/heads/main/Project%202/Life_Expectancy_API_SP.DYN.LE00.IN_DS2_en_csv_v2_460061.csv"
+
+life_raw <- read_csv(
+  life_url,
+  skip = 4
+)
+```
+
+The third dataset contains life expectancy at birth data from the World Bank for countries and regions beginning in 1960. The original dataset is in wide format because each year is stored in a separate column.
+
+The goal of this analysis is to transform the dataset into a tidy long format with separate variables for country, year, and life expectancy. I will then compare changes in life expectancy between Bangladesh and the United States and examine whether the life expectancy gapbetween the two countries has increased or decreased over time. The original dataset was obtained from other student, Ummay Rukiya, on 5A discussion and was saved as a CSV file on my github in its original wide format: [https://github.com/yeimiperez14/Data_607/tree/main/Project%202.](https://github.com/yeimiperez14/Data_607/tree/main/Project%202)
+
+### Data structure before tidying
+
+```{r}
+names(life_raw)
+```
+
+```{r}
+dim(life_raw)
+names(life_raw)
+head(life_raw)
+glimpse(life_raw)
+```
+
+### Transformation steps
+
+```{r}
+life_clean <- life_raw %>%
+  select(-where(~ all(is.na(.))))
+
+dim(life_clean)
+```
+
+`all(is.na(.))` checks whether every value in a column is missing. `select(-where(...))` removes any completely empty columns. I removed any completely empty columns because they contained no information that could be used in the analysis. No country observations were removed during this step.
+
+```{r}
+life_long <- life_clean %>%
+  pivot_longer(
+    cols = matches("^\\d{4}$"),
+    names_to = "year",
+    values_to = "life_expectancy"
+  )
+
+head(life_long)
+```
+
+matches("\^\\\\d{4}\$") selects column names containing exactly four digits, then `pivot_longer()` moves those years into one `year` column and puts the corresponding values into one `life_expectancy` column.
+
+```{r}
+life_tidy <- life_long %>%
+  rename(
+    country = `Country Name`,
+    country_code = `Country Code`,
+    indicator = `Indicator Name`,
+    indicator_code = `Indicator Code`
+  ) %>%
+  mutate(
+    year = as.integer(year)
+  )
+
+glimpse(life_tidy)
+```
+
+We now have one variable per column and one observation per row.
+
+### Addressing missing values
+
+```{r}
+colSums(is.na(life_tidy))
+```
+
+```{r}
+life_tidy %>%
+  filter(
+    country %in% c("Bangladesh", "United States")
+  ) %>%
+  summarise(
+    total_rows = n(),
+    missing_life_expectancy = sum(is.na(life_expectancy)),
+    first_year_available = min(year[!is.na(life_expectancy)]),
+    last_year_available = max(year[!is.na(life_expectancy)])
+  )
+```
+
+Bangladesh and the United States both have complete life-expectancy data from 1960 through 2024. You have 130 total observations because there are 65 years for each of the two countries: 65 years × 2 countries = 130 observations with no missing life expectancy values.
+
+### Analysis
+
+```{r}
+life_comparison <- life_tidy %>%
+  filter(
+    country %in% c("Bangladesh", "United States")
+  ) %>%
+  select(
+    country,
+    year,
+    life_expectancy
+  )
+
+life_comparison
+```
+
+Here I filtered the tidy dataset to our two countries.
+
+### Visualization
+
+```{r}
+ggplot(
+  life_comparison,
+  aes(
+    x = year,
+    y = life_expectancy,
+    color = country
+  )
+) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Life Expectancy Over Time",
+    subtitle = "Bangladesh and the United States, 1960-2024",
+    x = "Year",
+    y = "Life Expectancy (Years)",
+    color = "Country"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(
+      size = 16,
+      face = "bold"
+    ),
+    plot.subtitle = element_text(
+      size = 11
+    )
+  )
+```
+
+```{r}
+life_gap <- life_comparison %>%
+  pivot_wider(
+    names_from = country,
+    values_from = life_expectancy
+  ) %>%
+  mutate(
+    gap = `United States` - Bangladesh
+  )
+
+life_gap
+```
+
+The `gap` variable tells us how many years higher U.S. life expectancy was than Bangladesh's in each year.
+
+```{r}
+life_gap %>%
+  filter(year %in% c(1960, 2024))
+```
+
+Here I compared the beginning and end values for 1960 and 2024. 1960: Bangladesh = 43.98 years; U.S. = 69.77 years → gap = 25.79 years. 2024: Bangladesh = 74.93 years; U.S. = 78.89 years → gap = 3.96 years. Therefore, the gap narrowed by about 21.83 years.
+
+```{r}
+gap_change <- life_gap %>%
+  filter(year %in% c(1960, 2024)) %>%
+  summarise(
+    gap_1960 = gap[year == 1960],
+    gap_2024 = gap[year == 2024],
+    decrease_in_gap = gap_1960 - gap_2024
+  )
+
+gap_change
+```
+
+Here I calculated how much the gap decreased, the life expectancy between the two countries narrowed by approximately 21.83 years.
+
+```{r}
+ggplot(
+  life_gap,
+  aes(
+    x = year,
+    y = gap
+  )
+) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Life Expectancy Gap Over Time",
+    subtitle = "United States compared with Bangladesh, 1960-2024",
+    x = "Year",
+    y = "Life Expectancy Gap (Years)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(
+      size = 16,
+      face = "bold"
+    ),
+    plot.subtitle = element_text(
+      size = 11
+    )
+  )
+```
+
+Each point along the line represents the difference between U.S. and Bangladesh life expectancy for that year. A declining line indicates that the difference between the two countries is becoming smaller.
+
+### Interpretation
+
+The analysis shows that life expectancy increased in both Bangladesh and the United States between 1960 and 2024, but Bangladesh experienced a much larger improvement. In 1960, life expectancy was approximately 43.98 years in Bangladesh compared with 69.77 years in the United States, a gap of about 25.79 years. By 2024, life expectancy had increased to approximately 74.93 years in Bangladesh and 78.89 years in the United States. The gap decreased to approximately 3.96 years, meaning the difference between the two countries narrowed by about 21.83 years over the period. The results show that Bangladesh moved substantially closer to the United States in life expectancy.
+
+# Conclusion
+
+This project demonstrated how three different wide-format datasets can be transformed into tidy formats using `tidyr` and `dplyr` and then used for analysis. The tuition data showed an overall increase in tuition over time, with Hawaii experiencing the largest increase among the states analyzed. The Census population data showed different population trends from 2020 to 2022, with Florida having the largest percentage increase and New York having the largest percentage decrease among the 10 states. Finally, the World Bank life expectancy data showed that although life expectancy increased in both Bangladesh and the United States, the gap between the two countries decreased substantially from about 25.79 years in 1960 to 3.96 years in 2024. Overall, tidying each dataset made it easier to calculate changes, compare groups, identify trends, and create clear visualizations.
