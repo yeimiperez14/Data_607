@@ -1,0 +1,647 @@
+---
+title: "Asthma_Project3(YP)"
+Author: "Yeimi Perez"
+format: html
+editor: visual
+---
+
+# Introduction/Approach
+
+For my portion of the group project, I will focus on adult asthma (age 16+) across New York City. I will use three datasets from the NYC Environment & Health Data Portal: adults with asthma, asthma-related emergency department visits, and asthma-related hospitalizations. These datasets will allow me to examine asthma burden from different perspectives and identify patterns across NYC communities.
+
+I will clean and prepare the data in R, examine missing values and potential outliers, and perform exploratory analysis. I will compare asthma estimates across geographic areas and, where available, examine trends over time. The cleaned asthma data will then be incorporated into the group’s relational database and compared with the diabetes and high blood pressure findings.
+
+## Analysis Questions
+
+**Individual intake on Asthma prevalence across NYC:**
+
+How does asthma burden vary across NYC neighborhoods and boroughs, and which communities have the highest rates of asthma-related emergency department visits and hospitalizations?
+
+Source: <https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/asthma/>
+
+<https://github.com/yeimiperez14/Data_607/tree/main/Project%203>
+
+**Group Project connection question:**
+
+How do asthma, diabetes, and high blood pressure rates vary across New York City neighborhoods, and which communities experience the greatest health burdens?
+
+**Comparable Asthma Measures to be used:**
+
+|                   |                      |
+|-------------------|----------------------|
+| Asthma prevalence | How common asthma is |
+
+|                      |                               |
+|----------------------|-------------------------------|
+| Asthma ED visit rate | Indicates acute asthma burden |
+
+|                             |                                |
+|-----------------------------|--------------------------------|
+| Asthma hospitalization rate | Indicates more severe outcomes |
+
+**Important note on dataset:** The three asthma datasets may not use identical geographic boundaries or reporting periods. The NYC Environment & Health Data Portal provides indicators using different geographic definitions, including United Hospital Fund (UHF) neighborhoods and Neighborhood Tabulation Areas (NTAs), depending on the underlying data source. Reporting years may also differ across asthma prevalence, emergency department visits, and hospitalizations. These differences will be reviewed during data preparation and considered when comparing results across the three asthma measures.
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(jsonlite)
+
+# GitHub API URL for your Project 3 folder
+github_api <- paste0(
+  "https://api.github.com/repos/",
+  "yeimiperez14/Data_607/contents/Project%203"
+)
+
+# Retrieve the files in the folder
+github_files <- fromJSON(github_api)
+
+# Display available CSV files
+github_files %>%
+  filter(str_detect(name, regex("\\.csv$", ignore_case = TRUE))) %>%
+  select(name, download_url)
+```
+
+```{r}
+csv_files <- github_files %>%
+  filter(str_detect(
+    name, regex("\\.csv$", ignore_case = TRUE)
+  ))
+
+# Function to find exactly one matching dataset
+get_csv_url <- function(pattern) {
+  
+  matches <- csv_files %>%
+    filter(str_detect(
+      name, regex(pattern, ignore_case = TRUE)
+    ))
+  
+  if (nrow(matches) != 1) {
+    stop(
+      "Expected one matching file for: ",
+      pattern,
+      ". Check the filenames."
+    )
+  }
+  
+  matches$download_url[[1]]
+}
+
+# Import adult asthma prevalence
+asthma_prevalence_raw <- read_csv(
+  get_csv_url("adults.with.asthma|asthma_prevalence")
+)
+
+# Import adult asthma ED visits
+asthma_ed_raw <- read_csv(
+  get_csv_url("emergency|ed_visits")
+)
+
+# Import adult asthma hospitalizations
+asthma_hospital_raw <- read_csv(
+  get_csv_url("hospitalizations")
+)
+```
+
+```{r}
+glimpse(asthma_prevalence_raw)
+```
+
+```{r}
+glimpse(asthma_ed_raw)
+```
+
+```{r}
+glimpse(asthma_hospital_raw)
+```
+
+```{r}
+names(asthma_prevalence_raw)
+
+names(asthma_ed_raw)
+
+names(asthma_hospital_raw)
+```
+
+```{r}
+dim(asthma_prevalence_raw)
+
+dim(asthma_ed_raw)
+
+dim(asthma_hospital_raw)
+```
+
+## Dataset 1: Asthma Prevalence
+
+Where is adult asthma prevalence highest?
+
+### Cleaning the Dataset
+
+```{r}
+glimpse(asthma_prevalence_raw)
+```
+
+```{r}
+asthma_prevalence_clean <- asthma_prevalence_raw %>%
+  clean_names()
+```
+
+```{r}
+names(asthma_prevalence_clean)
+```
+
+```{r}
+asthma_prevalence_clean %>%
+  count(geo_type_pretty)
+```
+
+The original asthma prevalence dataset contained multiple geographic levels, including citywide, borough, and UHF34 observations. These geographic levels were identified before filtering the data for neighborhood-level analysis.
+
+```{r}
+asthma_prevalence_clean %>%
+  count(time_period)
+```
+
+```{r}
+asthma_prevalence_clean <- asthma_prevalence_clean %>%
+  mutate(
+    number_numeric = parse_number(number)
+  )
+```
+
+```{r}
+asthma_prevalence_clean %>%
+  select(geography, number, number_numeric) %>%
+  head()
+```
+
+### Analysis
+
+Extracting the Asthma percentage
+
+```{r}
+asthma_prevalence_clean <- asthma_prevalence_clean %>%
+  mutate(
+    percent_numeric = parse_number(percent),
+    age_adjusted_percent_numeric =
+      parse_number(age_adjusted_percent)
+  )
+```
+
+```{r}
+asthma_prevalence_clean %>%
+  select(
+    geography,
+    percent,
+    percent_numeric,
+    age_adjusted_percent,
+    age_adjusted_percent_numeric
+  ) %>%
+  head()
+```
+
+Checking for missing values
+
+```{r}
+colSums(is.na(asthma_prevalence_clean))
+```
+
+Checking for dup rows
+
+```{r}
+sum(duplicated(asthma_prevalence_clean))
+```
+
+Neighborhood-level dataset
+
+```{r}
+asthma_prevalence_uhf <- asthma_prevalence_clean %>%
+  filter(geo_type_pretty == "UHF34")
+```
+
+```{r}
+glimpse(asthma_prevalence_uhf)
+```
+
+```{r}
+nrow(asthma_prevalence_uhf)
+```
+
+```{r}
+asthma_prevalence_uhf %>%
+  select(
+    borough,
+    geography,
+    percent_numeric,
+    age_adjusted_percent_numeric
+  ) %>%
+  arrange(desc(age_adjusted_percent_numeric))
+```
+
+This will rank the UHF34 areas from highest to lowest age-adjusted adult asthma prevalence.
+
+```{r}
+asthma_prevalence_uhf %>%
+  select(
+    borough,
+    geography,
+    percent_numeric,
+    age_adjusted_percent_numeric
+  ) %>%
+  arrange(desc(age_adjusted_percent_numeric))
+```
+
+Checking for potential outliers
+
+```{r}
+summary(
+  asthma_prevalence_uhf$age_adjusted_percent_numeric
+)
+```
+
+```{r}
+# Select the 10 UHF areas with the highest
+# age-adjusted asthma prevalence
+asthma_top10 <- asthma_prevalence_uhf %>%
+  arrange(desc(age_adjusted_percent_numeric)) %>%
+  slice_head(n = 10)
+
+# Create the visualization
+ggplot(
+  asthma_top10,
+  aes(
+    x = age_adjusted_percent_numeric,
+    y = reorder(geography, age_adjusted_percent_numeric)
+  )
+) +
+  geom_col() +
+  geom_text(
+    aes(
+      label = paste0(age_adjusted_percent_numeric, "%")
+    ),
+    hjust = -0.15,
+    size = 3.5
+  ) +
+  labs(
+    title = "NYC Areas with the Highest Adult Asthma Prevalence",
+    subtitle = "Top 10 UHF areas based on age-adjusted prevalence",
+    x = "Age-adjusted asthma prevalence (%)",
+    y = "UHF Area",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  expand_limits(
+    x = max(asthma_top10$age_adjusted_percent_numeric) + 3
+  ) +
+  theme_minimal()
+```
+
+### **Findings**
+
+The analysis shows substantial differences in age-adjusted asthma prevalence across NYC UHF areas. East Harlem had the highest prevalence at 26.2%, followed by the Rockaways at 25.8% and Northeast Bronx at 25.0%. Several Bronx and Brooklyn UHF areas also appeared among the ten areas with the highest prevalence. These results identify geographic patterns in asthma prevalence but do not explain the causes of those differences.
+
+## Dataset 2: Asthma Emergency Department Visits
+
+```{r}
+asthma_ed_raw
+```
+
+```{r}
+glimpse(asthma_ed_raw)
+```
+
+```{r}
+dim(asthma_ed_raw)
+```
+
+```{r}
+names(asthma_ed_raw)
+```
+
+```{r}
+asthma_ed_raw %>%
+  count(TimePeriod) %>%
+  arrange(TimePeriod)
+```
+
+```{r}
+asthma_ed_raw %>%
+  count(Geography) %>%
+  arrange(Geography)
+```
+
+```{r}
+n_distinct(asthma_ed_raw$Geography)
+```
+
+```{r}
+range(asthma_ed_raw$TimePeriod, na.rm = TRUE)
+```
+
+The asthma emergency department visits dataset was inspected to understand its structure before cleaning and analysis. The dataset contains 114 observations and 10 variables. The column names, available years, and geographic areas were reviewed to determine how the data are organized. This step also identified the `Value` variable as the asthma ED visit measure and confirmed that the dataset contains multiple years, allowing trends in emergency department visits to be examined over time.
+
+### Cleaning the Dataset
+
+```{r}
+asthma_ed_clean <- asthma_ed_raw %>%
+  clean_names()
+```
+
+```{r}
+glimpse(asthma_ed_clean)
+```
+
+Addressing missing values
+
+```{r}
+colSums(is.na(asthma_ed_clean))
+```
+
+Checking for missing values
+
+```{r}
+asthma_ed_clean %>%
+  filter(is.na(value)) %>%
+  select(time_period, geography, value, note)
+```
+
+Checking for dup rows
+
+```{r}
+sum(duplicated(asthma_ed_clean))
+```
+
+```{r}
+unique(asthma_ed_clean$indicator)
+```
+
+The emergency department dataset reports the age-adjusted rate of adult asthma-related emergency department visits per 10,000 people. Because the dataset contains multiple years, it can be used to examine changes in asthma-related emergency department utilization over time
+
+### Analysis
+
+```{r}
+asthma_ed_clean %>%
+  distinct(geography) %>%
+  arrange(geography)
+```
+
+```{r}
+asthma_ed_clean %>%
+  group_by(geography) %>%
+  summarise(
+    first_year = min(time_period, na.rm = TRUE),
+    last_year = max(time_period, na.rm = TRUE),
+    observations = n()
+  ) %>%
+  arrange(geography)
+```
+
+**Geographic and Time Coverage:** The asthma emergency department dataset contains annual data from 2005 through 2023. It includes the five NYC boroughs—Bronx, Brooklyn, Manhattan, Queens, and Staten Island, as well as New York City overall. Each geographic area contains 19 annual observations, allowing asthma-related emergency department utilization to be compared across boroughs and examined over time.
+
+```{r}
+asthma_ed_clean %>%
+  filter(is.na(value)) %>%
+  select(time_period, geography, value, note)
+```
+
+```{r}
+sum(is.na(asthma_ed_clean$value))
+```
+
+```{r}
+summary(asthma_ed_clean$value)
+```
+
+```{r}
+asthma_ed_clean %>%
+  filter(!is.na(value)) %>%
+  arrange(desc(value)) %>%
+  select(time_period, geography, value) %>%
+  slice_head(n = 10)
+```
+
+Exploratory: The asthma ED visit rates ranged from 26.3 to 225.1 visits per 10,000 people, with six missing observations. The highest observed rates were consistently associated with the Bronx, including the highest rate of 225.1 per 10,000 in 2014. These higher values were retained because they may represent meaningful geographic differences in asthma-related emergency department utilization rather than data errors.
+
+```{r}
+asthma_ed_boroughs <- asthma_ed_clean %>%
+  filter(
+    geography != "New York City",
+    !is.na(value)
+  )
+```
+
+```{r}
+ggplot(
+  asthma_ed_boroughs,
+  aes(
+    x = time_period,
+    y = value,
+    color = geography,
+    group = geography
+  )
+) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Adult Asthma Emergency Department Visit Rates by NYC Borough",
+    subtitle = "Age-adjusted rates from 2005–2023",
+    x = "Year",
+    y = "ED visits per 10,000 people",
+    color = "Borough",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  scale_x_continuous(
+    breaks = seq(2005, 2023, by = 2)
+  ) +
+  theme_minimal()
+```
+
+Filtering ED visits to 2020 for adjusted prevalence match based on dataset 1
+
+```{r}
+asthma_ed_2020 <- asthma_ed_clean %>%
+  filter(
+    time_period == 2020,
+    geography != "New York City",
+    !is.na(value)
+  ) %>%
+  arrange(desc(value))
+
+asthma_ed_2020
+```
+
+```{r}
+ggplot(
+  asthma_ed_2020,
+  aes(
+    x = value,
+    y = reorder(geography, value)
+  )
+) +
+  geom_col() +
+  geom_text(
+    aes(label = round(value, 1)),
+    hjust = -0.15,
+    size = 3.5
+  ) +
+  labs(
+    title = "Adult Asthma Emergency Department Visit Rates by NYC Borough",
+    subtitle = "Age-adjusted rate per 10,000 people, 2020",
+    x = "ED visits per 10,000 people",
+    y = "Borough",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  expand_limits(
+    x = max(asthma_ed_2020$value) + 15
+  ) +
+  theme_minimal()
+```
+
+### Findings
+
+The 2020 analysis shows differences in age-adjusted adult asthma emergency department visit rates across NYC boroughs. The data were examined for missing values and unusually high observations before comparing borough-level rates. Because emergency department utilization was affected by the COVID-19 pandemic in 2020, these results should be interpreted as a snapshot of asthma-related ED use during an atypical healthcare-utilization period rather than as a measure of asthma prevalence.
+
+## Dataset 3: Adult Asthma Hospitalizations
+
+```{r}
+glimpse(asthma_hospital_raw)
+```
+
+```{r}
+dim(asthma_hospital_raw)
+```
+
+```{r}
+names(asthma_hospital_raw)
+```
+
+```{r}
+glimpse(asthma_hospital_raw)
+```
+
+**Preliminary Finding:** The 2020 analysis shows differences in age-adjusted adult asthma emergency department visit rates across NYC boroughs. The data were examined for missing values and unusually high observations before comparing borough-level rates. Because emergency department utilization was affected by the COVID-19 pandemic in 2020, these results should be interpreted as a snapshot of asthma-related ED use during an atypical healthcare-utilization period rather than as a measure of asthma prevalence.
+
+### Cleaning the dataset
+
+```{r}
+asthma_hospital_clean <- asthma_hospital_raw %>%
+  janitor::clean_names() %>%
+  mutate(
+    number_numeric = readr::parse_number(number),
+    annual_rate_numeric =
+      readr::parse_number(estimated_annual_rate_per_10_000),
+    age_adjusted_rate_numeric =
+      readr::parse_number(age_adjusted_rate_per_10_000)
+  )
+```
+
+```{r}
+names(asthma_hospital_clean)
+```
+
+```{r}
+asthma_hospital_clean %>%
+  count(time_period) %>%
+  arrange(time_period)
+```
+
+```{r}
+asthma_hospital_2023 <- asthma_hospital_clean %>%
+  filter(
+    time_period == 2023,
+    geo_type_pretty == "UHF42",
+    !is.na(age_adjusted_rate_numeric)
+  ) %>%
+  arrange(desc(age_adjusted_rate_numeric))
+```
+
+```{r}
+names(asthma_hospital_clean)
+```
+
+```{r}
+names(asthma_hospital_clean)[
+  grepl("age_adjusted", names(asthma_hospital_clean))
+]
+```
+
+```{r}
+asthma_hospital_clean <- asthma_hospital_clean %>%
+  mutate(
+    age_adjusted_rate_numeric =
+      readr::parse_number(age_adjusted_rate_per_10_000)
+  )
+```
+
+```{r}
+asthma_hospital_clean %>%
+  select(
+    time_period,
+    geography,
+    age_adjusted_rate_per_10_000,
+    age_adjusted_rate_numeric
+  ) %>%
+  head()
+```
+
+### Analysis
+
+```{r}
+asthma_hospital_2023 <- asthma_hospital_clean %>%
+  filter(
+    time_period == 2023,
+    geo_type_pretty == "UHF42",
+    !is.na(age_adjusted_rate_numeric)
+  ) %>%
+  arrange(desc(age_adjusted_rate_numeric))
+```
+
+```{r}
+nrow(asthma_hospital_2023)
+```
+
+```{r}
+asthma_hospital_2023 %>%
+  select(
+    borough,
+    geography,
+    age_adjusted_rate_numeric
+  ) %>%
+  slice_head(n = 10)
+```
+
+```{r}
+asthma_hospital_top10 <- asthma_hospital_2023 %>%
+  slice_head(n = 10)
+
+ggplot(
+  asthma_hospital_top10,
+  aes(
+    x = age_adjusted_rate_numeric,
+    y = reorder(geography, age_adjusted_rate_numeric)
+  )
+) +
+  geom_col() +
+  geom_text(
+    aes(label = age_adjusted_rate_numeric),
+    hjust = -0.15,
+    size = 3.5
+  ) +
+  labs(
+    title = "NYC Areas with the Highest Adult Asthma Hospitalization Rates",
+    subtitle = "Top 10 UHF42 areas based on age-adjusted rates, 2023",
+    x = "Hospitalizations per 10,000 people",
+    y = "UHF42 Area",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  expand_limits(
+    x = max(asthma_hospital_top10$age_adjusted_rate_numeric) + 3
+  ) +
+  theme_minimal()
+```
+
+### Findings
+
+Adult asthma hospitalization rates varied across NYC UHF42 areas in 2023. Hunts Point–Mott Haven had the highest age-adjusted hospitalization rate at 22.9 per 10,000, followed by Crotona–Tremont at 19.8 and Pelham–Throgs Neck at 18.8. The six areas with the highest hospitalization rates were all located in the Bronx, indicating a clear geographic concentration of higher asthma-related hospitalization rates.
+
+# Conclusion
+
+Across the three datasets, asthma burden varied across New York City, with several Bronx communities consistently showing higher rates. In 2020, East Harlem had the highest age-adjusted asthma prevalence, while the Bronx had the highest asthma emergency department visit rate. In 2023, the highest hospitalization rates were concentrated in the Bronx, led by Hunts Point–Mott Haven. The recurrence of higher rates in certain communities suggests that asthma burden may be concentrated in specific areas rather than evenly distributed throughout the city. These findings also identify communities that may benefit from further analysis to better understand the factors associated with higher asthma burden. The findings suggest geographic disparities in asthma burden across NYC. However, because the datasets use different years and geographic levels, the results should be viewed as complementary patterns rather than direct comparisons.

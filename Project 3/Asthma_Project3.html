@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Asthma_Project3(YP)</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Asthma_Project3_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Asthma_Project3_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Asthma_Project3_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Asthma_Project3_files/libs/quarto-html/popper.min.js"></script>
+<script src="Asthma_Project3_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Asthma_Project3_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Asthma_Project3_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Asthma_Project3_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Asthma_Project3_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Asthma_Project3_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Asthma_Project3_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Asthma_Project3(YP)</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introductionapproach" class="level1">
+<h1>Introduction/Approach</h1>
+<p>For my portion of the group project, I will focus on adult asthma (age 16+) across New York City. I will use three datasets from the NYC Environment &amp; Health Data Portal: adults with asthma, asthma-related emergency department visits, and asthma-related hospitalizations. These datasets will allow me to examine asthma burden from different perspectives and identify patterns across NYC communities.</p>
+<p>I will clean and prepare the data in R, examine missing values and potential outliers, and perform exploratory analysis. I will compare asthma estimates across geographic areas and, where available, examine trends over time. The cleaned asthma data will then be incorporated into the group’s relational database and compared with the diabetes and high blood pressure findings.</p>
+<section id="analysis-questions" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-questions">Analysis Questions</h2>
+<p><strong>Individual intake on Asthma prevalence across NYC:</strong></p>
+<p>How does asthma burden vary across NYC neighborhoods and boroughs, and which communities have the highest rates of asthma-related emergency department visits and hospitalizations?</p>
+<p>Source: <a href="https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/asthma/" class="uri">https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/asthma/</a></p>
+<p><a href="https://github.com/yeimiperez14/Data_607/tree/main/Project%203" class="uri">https://github.com/yeimiperez14/Data_607/tree/main/Project%203</a></p>
+<p><strong>Group Project connection question:</strong></p>
+<p>How do asthma, diabetes, and high blood pressure rates vary across New York City neighborhoods, and which communities experience the greatest health burdens?</p>
+<p><strong>Comparable Asthma Measures to be used:</strong></p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td>Asthma prevalence</td>
+<td>How common asthma is</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td>Asthma ED visit rate</td>
+<td>Indicates acute asthma burden</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td>Asthma hospitalization rate</td>
+<td>Indicates more severe outcomes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Important note on dataset:</strong> The three asthma datasets may not use identical geographic boundaries or reporting periods. The NYC Environment &amp; Health Data Portal provides indicators using different geographic definitions, including United Hospital Fund (UHF) neighborhoods and Neighborhood Tabulation Areas (NTAs), depending on the underlying data source. Reporting years may also differ across asthma prevalence, emergency department visits, and hospitalizations. These differences will be reviewed during data preparation and considered when comparing results across the three asthma measures.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'janitor'
+
+The following objects are masked from 'package:stats':
+
+    chisq.test, fisher.test</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'jsonlite'
+
+The following object is masked from 'package:purrr':
+
+    flatten</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># GitHub API URL for your Project 3 folder</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>github_api <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"https://api.github.com/repos/"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"yeimiperez14/Data_607/contents/Project%203"</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrieve the files in the folder</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>github_files <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(github_api)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Display available CSV files</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>github_files <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(name, <span class="fu">regex</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">.csv$"</span>, <span class="at">ignore_case =</span> <span class="cn">TRUE</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, download_url)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                         name
+1        asthma_ed_visits.csv
+2 asthma_hospitalizations.csv
+3       asthma_prevalence.csv
+                                                                                          download_url
+1        https://raw.githubusercontent.com/yeimiperez14/Data_607/main/Project%203/asthma_ed_visits.csv
+2 https://raw.githubusercontent.com/yeimiperez14/Data_607/main/Project%203/asthma_hospitalizations.csv
+3       https://raw.githubusercontent.com/yeimiperez14/Data_607/main/Project%203/asthma_prevalence.csv</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>csv_files <span class="ot">&lt;-</span> github_files <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    name, <span class="fu">regex</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">.csv$"</span>, <span class="at">ignore_case =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to find exactly one matching dataset</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>get_csv_url <span class="ot">&lt;-</span> <span class="cf">function</span>(pattern) {</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  matches <span class="ot">&lt;-</span> csv_files <span class="sc">%&gt;%</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">str_detect</span>(</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>      name, <span class="fu">regex</span>(pattern, <span class="at">ignore_case =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(matches) <span class="sc">!=</span> <span class="dv">1</span>) {</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Expected one matching file for: "</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>      pattern,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">". Check the filenames."</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  matches<span class="sc">$</span>download_url[[<span class="dv">1</span>]]</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Import adult asthma prevalence</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_csv_url</span>(<span class="st">"adults.with.asthma|asthma_prevalence"</span>)</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 40 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (9): GeoTypePretty, GeoTypeDesc, BoroID, Borough, Geography, Area, Numbe...
+dbl (3): TimePeriod, GeoID, GeoRank
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import adult asthma ED visits</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>asthma_ed_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_csv_url</span>(<span class="st">"emergency|ed_visits"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 114 Columns: 10
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (3): Note, Geography, Indicator
+dbl (6): GeoID, TimePeriodID, Value, Lat, Long, TimePeriod
+lgl (1): CI
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import adult asthma hospitalizations</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>asthma_hospital_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_csv_url</span>(<span class="st">"hospitalizations"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 107 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (9): GeoTypePretty, GeoTypeDesc, BoroID, Borough, Geography, Area, Numbe...
+dbl (3): TimePeriod, GeoID, GeoRank
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(asthma_prevalence_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 40
+Columns: 12
+$ TimePeriod             &lt;dbl&gt; 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020,…
+$ GeoTypePretty          &lt;chr&gt; "Citywide", "Borough", "Borough", "Borough", "B…
+$ GeoTypeDesc            &lt;chr&gt; "Citywide", "Borough", "Borough", "Borough", "B…
+$ GeoID                  &lt;dbl&gt; 1, 1, 2, 3, 4, 5, 101, 102, 103, 104, 105106107…
+$ GeoRank                &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,…
+$ BoroID                 &lt;chr&gt; "-", "1", "2", "3", "4", "5", "1", "1", "1", "1…
+$ Borough                &lt;chr&gt; "-", "Bronx", "Brooklyn", "Manhattan", "Queens"…
+$ Geography              &lt;chr&gt; "New York City", "Bronx", "Brooklyn", "Manhatta…
+$ Area                   &lt;chr&gt; "New York City", "Bronx", "Brooklyn", "Manhatta…
+$ Number                 &lt;chr&gt; "909,000", "215,000", "238,000", "203,000", "20…
+$ Percent                &lt;chr&gt; "14.1 (13.1, 15.3)", "21.0 (18.0, 24.5)", "12.2…
+$ `Age-adjusted percent` &lt;chr&gt; "14.2 (13.1, 15.3)", "20.7 (17.8, 24.0)", "12.3…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(asthma_ed_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 114
+Columns: 10
+$ GeoID        &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ TimePeriodID &lt;dbl&gt; 298, 296, 289, 49, 48, 47, 46, 45, 44, 41, 40, 39, 38, 14…
+$ Value        &lt;dbl&gt; 66.4, 58.7, 49.7, 48.4, 78.3, 89.9, 84.1, 99.1, NA, 114.7…
+$ CI           &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ Note         &lt;chr&gt; NA, NA, NA, "The start of COVID-19 in Spring 2020 reduced…
+$ Geography    &lt;chr&gt; "New York City", "New York City", "New York City", "New Y…
+$ Lat          &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ Long         &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ TimePeriod   &lt;dbl&gt; 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 201…
+$ Indicator    &lt;chr&gt; "Asthma emergency department visits (adults): Asthma emer…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(asthma_hospital_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 107
+Columns: 12
+$ TimePeriod                         &lt;dbl&gt; 2023, 2023, 2023, 2023, 2023, 2023,…
+$ GeoTypePretty                      &lt;chr&gt; "Citywide", "Borough", "Borough", "…
+$ GeoTypeDesc                        &lt;chr&gt; "Citywide", "Borough", "Borough", "…
+$ GeoID                              &lt;dbl&gt; 1, 1, 2, 3, 4, 5, 101, 102, 103, 10…
+$ GeoRank                            &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4,…
+$ BoroID                             &lt;chr&gt; "-", "1", "2", "3", "4", "5", "1", …
+$ Borough                            &lt;chr&gt; "-", "Bronx", "Brooklyn", "Manhatta…
+$ Geography                          &lt;chr&gt; "New York City", "Bronx", "Brooklyn…
+$ Area                               &lt;chr&gt; "New York City", "Bronx", "Brooklyn…
+$ Number                             &lt;chr&gt; "5,498", "1,947", "1,355", "757", "…
+$ `Estimated annual rate per 10,000` &lt;chr&gt; "8.3", "18.8", "6.7", "5.5", "6.4",…
+$ `Age-adjusted rate per 10,000`     &lt;chr&gt; "8.0", "18.3", "6.6", "5.4", "6.1",…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(asthma_prevalence_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "TimePeriod"           "GeoTypePretty"        "GeoTypeDesc"         
+ [4] "GeoID"                "GeoRank"              "BoroID"              
+ [7] "Borough"              "Geography"            "Area"                
+[10] "Number"               "Percent"              "Age-adjusted percent"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(asthma_ed_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "GeoID"        "TimePeriodID" "Value"        "CI"           "Note"        
+ [6] "Geography"    "Lat"          "Long"         "TimePeriod"   "Indicator"   </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(asthma_hospital_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "TimePeriod"                       "GeoTypePretty"                   
+ [3] "GeoTypeDesc"                      "GeoID"                           
+ [5] "GeoRank"                          "BoroID"                          
+ [7] "Borough"                          "Geography"                       
+ [9] "Area"                             "Number"                          
+[11] "Estimated annual rate per 10,000" "Age-adjusted rate per 10,000"    </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(asthma_prevalence_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 40 12</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(asthma_ed_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 114  10</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(asthma_hospital_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 107  12</code></pre>
+</div>
+</div>
+</section>
+<section id="dataset-1-asthma-prevalence" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-1-asthma-prevalence">Dataset 1: Asthma Prevalence</h2>
+<p>Where is adult asthma prevalence highest?</p>
+<section id="cleaning-the-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="cleaning-the-dataset">Cleaning the Dataset</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(asthma_prevalence_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 40
+Columns: 12
+$ TimePeriod             &lt;dbl&gt; 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020,…
+$ GeoTypePretty          &lt;chr&gt; "Citywide", "Borough", "Borough", "Borough", "B…
+$ GeoTypeDesc            &lt;chr&gt; "Citywide", "Borough", "Borough", "Borough", "B…
+$ GeoID                  &lt;dbl&gt; 1, 1, 2, 3, 4, 5, 101, 102, 103, 104, 105106107…
+$ GeoRank                &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,…
+$ BoroID                 &lt;chr&gt; "-", "1", "2", "3", "4", "5", "1", "1", "1", "1…
+$ Borough                &lt;chr&gt; "-", "Bronx", "Brooklyn", "Manhattan", "Queens"…
+$ Geography              &lt;chr&gt; "New York City", "Bronx", "Brooklyn", "Manhatta…
+$ Area                   &lt;chr&gt; "New York City", "Bronx", "Brooklyn", "Manhatta…
+$ Number                 &lt;chr&gt; "909,000", "215,000", "238,000", "203,000", "20…
+$ Percent                &lt;chr&gt; "14.1 (13.1, 15.3)", "21.0 (18.0, 24.5)", "12.2…
+$ `Age-adjusted percent` &lt;chr&gt; "14.2 (13.1, 15.3)", "20.7 (17.8, 24.0)", "12.3…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_clean <span class="ot">&lt;-</span> asthma_prevalence_raw <span class="sc">%&gt;%</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(asthma_prevalence_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "time_period"          "geo_type_pretty"      "geo_type_desc"       
+ [4] "geo_id"               "geo_rank"             "boro_id"             
+ [7] "borough"              "geography"            "area"                
+[10] "number"               "percent"              "age_adjusted_percent"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_clean <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(geo_type_pretty)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  geo_type_pretty     n
+  &lt;chr&gt;           &lt;int&gt;
+1 Borough             5
+2 Citywide            1
+3 UHF34              34</code></pre>
+</div>
+</div>
+<p>The original asthma prevalence dataset contained multiple geographic levels, including citywide, borough, and UHF34 observations. These geographic levels were identified before filtering the data for neighborhood-level analysis.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_clean <span class="sc">%&gt;%</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(time_period)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  time_period     n
+        &lt;dbl&gt; &lt;int&gt;
+1        2020    40</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_clean <span class="ot">&lt;-</span> asthma_prevalence_clean <span class="sc">%&gt;%</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">number_numeric =</span> <span class="fu">parse_number</span>(number)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_clean <span class="sc">%&gt;%</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geography, number, number_numeric) <span class="sc">%&gt;%</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  geography     number  number_numeric
+  &lt;chr&gt;         &lt;chr&gt;            &lt;dbl&gt;
+1 New York City 909,000         909000
+2 Bronx         215,000         215000
+3 Brooklyn      238,000         238000
+4 Manhattan     203,000         203000
+5 Queens        203,000         203000
+6 Staten Island 49,000           49000</code></pre>
+</div>
+</div>
+</section>
+<section id="analysis" class="level3">
+<h3 class="anchored" data-anchor-id="analysis">Analysis</h3>
+<p>Extracting the Asthma percentage</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_clean <span class="ot">&lt;-</span> asthma_prevalence_clean <span class="sc">%&gt;%</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_numeric =</span> <span class="fu">parse_number</span>(percent),</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_adjusted_percent_numeric =</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">parse_number</span>(age_adjusted_percent)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_clean <span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    geography,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    percent,</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    percent_numeric,</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    age_adjusted_percent,</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    age_adjusted_percent_numeric</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  geography  percent percent_numeric age_adjusted_percent age_adjusted_percent…¹
+  &lt;chr&gt;      &lt;chr&gt;             &lt;dbl&gt; &lt;chr&gt;                                 &lt;dbl&gt;
+1 New York … 14.1 (…            14.1 14.2 (13.1, 15.3)                      14.2
+2 Bronx      21.0 (…            21   20.7 (17.8, 24.0)                      20.7
+3 Brooklyn   12.2 (…            12.2 12.3 (10.7, 14.2)                      12.3
+4 Manhattan  15.3 (…            15.3 15.4 (13.0, 18.2)                      15.4
+5 Queens     11.5 (…            11.5 11.5 (9.6, 13.6)                       11.5
+6 Staten Is… 13.6 (…            13.6 13.8 (9.8, 19.1)                       13.8
+# ℹ abbreviated name: ¹​age_adjusted_percent_numeric</code></pre>
+</div>
+</div>
+<p>Checking for missing values</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(asthma_prevalence_clean))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 time_period              geo_type_pretty 
+                           0                            0 
+               geo_type_desc                       geo_id 
+                           0                            0 
+                    geo_rank                      boro_id 
+                           0                            0 
+                     borough                    geography 
+                           0                            0 
+                        area                       number 
+                           0                            0 
+                     percent         age_adjusted_percent 
+                           0                            0 
+              number_numeric              percent_numeric 
+                           0                            0 
+age_adjusted_percent_numeric 
+                           0 </code></pre>
+</div>
+</div>
+<p>Checking for dup rows</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">duplicated</span>(asthma_prevalence_clean))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<p>Neighborhood-level dataset</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_uhf <span class="ot">&lt;-</span> asthma_prevalence_clean <span class="sc">%&gt;%</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(geo_type_pretty <span class="sc">==</span> <span class="st">"UHF34"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(asthma_prevalence_uhf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 34
+Columns: 15
+$ time_period                  &lt;dbl&gt; 2020, 2020, 2020, 2020, 2020, 2020, 2020,…
+$ geo_type_pretty              &lt;chr&gt; "UHF34", "UHF34", "UHF34", "UHF34", "UHF3…
+$ geo_type_desc                &lt;chr&gt; "UHF 34", "UHF 34", "UHF 34", "UHF 34", "…
+$ geo_id                       &lt;dbl&gt; 101, 102, 103, 104, 105106107, 201, 202, …
+$ geo_rank                     &lt;dbl&gt; 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,…
+$ boro_id                      &lt;chr&gt; "1", "1", "1", "1", "1", "2", "2", "2", "…
+$ borough                      &lt;chr&gt; "Bronx", "Bronx", "Bronx", "Bronx", "Bron…
+$ geography                    &lt;chr&gt; "Kingsbridge - Riverdale", "Northeast Bro…
+$ area                         &lt;chr&gt; "Kingsbridge - Riverdale  Bronx", "Northe…
+$ number                       &lt;chr&gt; "8,000", "35,000*", "41,000", "45,000", "…
+$ percent                      &lt;chr&gt; "11.8 (6.6, 20.0)", "24.7* (15.8, 36.5)",…
+$ age_adjusted_percent         &lt;chr&gt; "11.6 (6.5, 19.8)", "25.0* (16.3, 36.4)",…
+$ number_numeric               &lt;dbl&gt; 8000, 35000, 41000, 45000, 79000, 9000, 1…
+$ percent_numeric              &lt;dbl&gt; 11.8, 24.7, 22.1, 20.0, 20.6, 8.5, 7.7, 1…
+$ age_adjusted_percent_numeric &lt;dbl&gt; 11.6, 25.0, 21.5, 19.7, 20.7, 8.6, 8.3, 1…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(asthma_prevalence_uhf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 34</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_uhf <span class="sc">%&gt;%</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>    borough,</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>    geography,</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>    percent_numeric,</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>    age_adjusted_percent_numeric</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(age_adjusted_percent_numeric))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 34 × 4
+   borough   geography                    percent_numeric age_adjusted_percent…¹
+   &lt;chr&gt;     &lt;chr&gt;                                  &lt;dbl&gt;                  &lt;dbl&gt;
+ 1 Manhattan East Harlem                             26                     26.2
+ 2 Queens    Rockaways                               24.7                   25.8
+ 3 Bronx     Northeast Bronx                         24.7                   25  
+ 4 Brooklyn  East New York                           21.9                   23.8
+ 5 Bronx     Fordham - Bronx Pk                      22.1                   21.5
+ 6 Brooklyn  Canarsie - Flatlands                    20.3                   21.4
+ 7 Bronx     South Bronx                             20.6                   20.7
+ 8 Bronx     Pelham - Throgs Neck                    20                     19.7
+ 9 Brooklyn  Bedford Stuyvesant - Crown …            18.1                   18.5
+10 Manhattan Washington Heights                      16.3                   16.6
+# ℹ 24 more rows
+# ℹ abbreviated name: ¹​age_adjusted_percent_numeric</code></pre>
+</div>
+</div>
+<p>This will rank the UHF34 areas from highest to lowest age-adjusted adult asthma prevalence.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>asthma_prevalence_uhf <span class="sc">%&gt;%</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>    borough,</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>    geography,</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>    percent_numeric,</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>    age_adjusted_percent_numeric</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(age_adjusted_percent_numeric))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 34 × 4
+   borough   geography                    percent_numeric age_adjusted_percent…¹
+   &lt;chr&gt;     &lt;chr&gt;                                  &lt;dbl&gt;                  &lt;dbl&gt;
+ 1 Manhattan East Harlem                             26                     26.2
+ 2 Queens    Rockaways                               24.7                   25.8
+ 3 Bronx     Northeast Bronx                         24.7                   25  
+ 4 Brooklyn  East New York                           21.9                   23.8
+ 5 Bronx     Fordham - Bronx Pk                      22.1                   21.5
+ 6 Brooklyn  Canarsie - Flatlands                    20.3                   21.4
+ 7 Bronx     South Bronx                             20.6                   20.7
+ 8 Bronx     Pelham - Throgs Neck                    20                     19.7
+ 9 Brooklyn  Bedford Stuyvesant - Crown …            18.1                   18.5
+10 Manhattan Washington Heights                      16.3                   16.6
+# ℹ 24 more rows
+# ℹ abbreviated name: ¹​age_adjusted_percent_numeric</code></pre>
+</div>
+</div>
+<p>Checking for potential outliers</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  asthma_prevalence_uhf<span class="sc">$</span>age_adjusted_percent_numeric</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   7.40   10.10   13.50   14.57   18.02   26.20 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the 10 UHF areas with the highest</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="co"># age-adjusted asthma prevalence</span></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>asthma_top10 <span class="ot">&lt;-</span> asthma_prevalence_uhf <span class="sc">%&gt;%</span></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(age_adjusted_percent_numeric)) <span class="sc">%&gt;%</span></span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the visualization</span></span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>  asthma_top10,</span>
+<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(</span>
+<span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> age_adjusted_percent_numeric,</span>
+<span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">reorder</span>(geography, age_adjusted_percent_numeric)</span>
+<span id="cb63-13"><a href="#cb63-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb63-14"><a href="#cb63-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb63-15"><a href="#cb63-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb63-16"><a href="#cb63-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb63-17"><a href="#cb63-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
+<span id="cb63-18"><a href="#cb63-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">label =</span> <span class="fu">paste0</span>(age_adjusted_percent_numeric, <span class="st">"%"</span>)</span>
+<span id="cb63-19"><a href="#cb63-19" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb63-20"><a href="#cb63-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.15</span>,</span>
+<span id="cb63-21"><a href="#cb63-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">3.5</span></span>
+<span id="cb63-22"><a href="#cb63-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb63-23"><a href="#cb63-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb63-24"><a href="#cb63-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"NYC Areas with the Highest Adult Asthma Prevalence"</span>,</span>
+<span id="cb63-25"><a href="#cb63-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Top 10 UHF areas based on age-adjusted prevalence"</span>,</span>
+<span id="cb63-26"><a href="#cb63-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age-adjusted asthma prevalence (%)"</span>,</span>
+<span id="cb63-27"><a href="#cb63-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"UHF Area"</span>,</span>
+<span id="cb63-28"><a href="#cb63-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: NYC Environment &amp; Health Data Portal"</span></span>
+<span id="cb63-29"><a href="#cb63-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb63-30"><a href="#cb63-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(</span>
+<span id="cb63-31"><a href="#cb63-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">max</span>(asthma_top10<span class="sc">$</span>age_adjusted_percent_numeric) <span class="sc">+</span> <span class="dv">3</span></span>
+<span id="cb63-32"><a href="#cb63-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb63-33"><a href="#cb63-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Asthma_Project3_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="findings" class="level3">
+<h3 class="anchored" data-anchor-id="findings"><strong>Findings</strong></h3>
+<p>The analysis shows substantial differences in age-adjusted asthma prevalence across NYC UHF areas. East Harlem had the highest prevalence at 26.2%, followed by the Rockaways at 25.8% and Northeast Bronx at 25.0%. Several Bronx and Brooklyn UHF areas also appeared among the ten areas with the highest prevalence. These results identify geographic patterns in asthma prevalence but do not explain the causes of those differences.</p>
+</section>
+</section>
+<section id="dataset-2-asthma-emergency-department-visits" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-2-asthma-emergency-department-visits">Dataset 2: Asthma Emergency Department Visits</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_raw</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 114 × 10
+   GeoID TimePeriodID Value CI    Note          Geography   Lat  Long TimePeriod
+   &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt; &lt;chr&gt;         &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;
+ 1     1          298  66.4 NA     &lt;NA&gt;         New York…    NA    NA       2023
+ 2     1          296  58.7 NA     &lt;NA&gt;         New York…    NA    NA       2022
+ 3     1          289  49.7 NA     &lt;NA&gt;         New York…    NA    NA       2021
+ 4     1           49  48.4 NA    "The start o… New York…    NA    NA       2020
+ 5     1           48  78.3 NA     &lt;NA&gt;         New York…    NA    NA       2019
+ 6     1           47  89.9 NA     &lt;NA&gt;         New York…    NA    NA       2018
+ 7     1           46  84.1 NA     &lt;NA&gt;         New York…    NA    NA       2017
+ 8     1           45  99.1 NA     &lt;NA&gt;         New York…    NA    NA       2016
+ 9     1           44  NA   NA    "†  &lt;strong … New York…    NA    NA       2015
+10     1           41 115.  NA     &lt;NA&gt;         New York…    NA    NA       2014
+# ℹ 104 more rows
+# ℹ 1 more variable: Indicator &lt;chr&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(asthma_ed_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 114
+Columns: 10
+$ GeoID        &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ TimePeriodID &lt;dbl&gt; 298, 296, 289, 49, 48, 47, 46, 45, 44, 41, 40, 39, 38, 14…
+$ Value        &lt;dbl&gt; 66.4, 58.7, 49.7, 48.4, 78.3, 89.9, 84.1, 99.1, NA, 114.7…
+$ CI           &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ Note         &lt;chr&gt; NA, NA, NA, "The start of COVID-19 in Spring 2020 reduced…
+$ Geography    &lt;chr&gt; "New York City", "New York City", "New York City", "New Y…
+$ Lat          &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ Long         &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ TimePeriod   &lt;dbl&gt; 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 201…
+$ Indicator    &lt;chr&gt; "Asthma emergency department visits (adults): Asthma emer…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(asthma_ed_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 114  10</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(asthma_ed_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "GeoID"        "TimePeriodID" "Value"        "CI"           "Note"        
+ [6] "Geography"    "Lat"          "Long"         "TimePeriod"   "Indicator"   </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_raw <span class="sc">%&gt;%</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(TimePeriod) <span class="sc">%&gt;%</span></span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(TimePeriod)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 19 × 2
+   TimePeriod     n
+        &lt;dbl&gt; &lt;int&gt;
+ 1       2005     6
+ 2       2006     6
+ 3       2007     6
+ 4       2008     6
+ 5       2009     6
+ 6       2010     6
+ 7       2011     6
+ 8       2012     6
+ 9       2013     6
+10       2014     6
+11       2015     6
+12       2016     6
+13       2017     6
+14       2018     6
+15       2019     6
+16       2020     6
+17       2021     6
+18       2022     6
+19       2023     6</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_raw <span class="sc">%&gt;%</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Geography) <span class="sc">%&gt;%</span></span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Geography)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  Geography         n
+  &lt;chr&gt;         &lt;int&gt;
+1 Bronx            19
+2 Brooklyn         19
+3 Manhattan        19
+4 New York City    19
+5 Queens           19
+6 Staten Island    19</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(asthma_ed_raw<span class="sc">$</span>Geography)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(asthma_ed_raw<span class="sc">$</span>TimePeriod, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2005 2023</code></pre>
+</div>
+</div>
+<p>The asthma emergency department visits dataset was inspected to understand its structure before cleaning and analysis. The dataset contains 114 observations and 10 variables. The column names, available years, and geographic areas were reviewed to determine how the data are organized. This step also identified the <code>Value</code> variable as the asthma ED visit measure and confirmed that the dataset contains multiple years, allowing trends in emergency department visits to be examined over time.</p>
+<section id="cleaning-the-dataset-1" class="level3">
+<h3 class="anchored" data-anchor-id="cleaning-the-dataset-1">Cleaning the Dataset</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_clean <span class="ot">&lt;-</span> asthma_ed_raw <span class="sc">%&gt;%</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(asthma_ed_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 114
+Columns: 10
+$ geo_id         &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+$ time_period_id &lt;dbl&gt; 298, 296, 289, 49, 48, 47, 46, 45, 44, 41, 40, 39, 38, …
+$ value          &lt;dbl&gt; 66.4, 58.7, 49.7, 48.4, 78.3, 89.9, 84.1, 99.1, NA, 114…
+$ ci             &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ note           &lt;chr&gt; NA, NA, NA, "The start of COVID-19 in Spring 2020 reduc…
+$ geography      &lt;chr&gt; "New York City", "New York City", "New York City", "New…
+$ lat            &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ long           &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ time_period    &lt;dbl&gt; 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2…
+$ indicator      &lt;chr&gt; "Asthma emergency department visits (adults): Asthma em…</code></pre>
+</div>
+</div>
+<p>Addressing missing values</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(asthma_ed_clean))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        geo_id time_period_id          value             ci           note 
+             0              0              6            114            102 
+     geography            lat           long    time_period      indicator 
+             0             19             19              0              0 </code></pre>
+</div>
+</div>
+<p>Checking for missing values</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_clean <span class="sc">%&gt;%</span></span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time_period, geography, value, note)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  time_period geography     value note                                          
+        &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt; &lt;chr&gt;                                         
+1        2015 New York City    NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+2        2015 Bronx            NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+3        2015 Brooklyn         NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+4        2015 Manhattan        NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+5        2015 Queens           NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+6        2015 Staten Island    NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…</code></pre>
+</div>
+</div>
+<p>Checking for dup rows</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">duplicated</span>(asthma_ed_clean))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(asthma_ed_clean<span class="sc">$</span>indicator)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Asthma emergency department visits (adults): Asthma emergency department visits (adults) Age-adjusted rate (per 10,000)"</code></pre>
+</div>
+</div>
+<p>The emergency department dataset reports the age-adjusted rate of adult asthma-related emergency department visits per 10,000 people. Because the dataset contains multiple years, it can be used to examine changes in asthma-related emergency department utilization over time</p>
+</section>
+<section id="analysis-1" class="level3">
+<h3 class="anchored" data-anchor-id="analysis-1">Analysis</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_clean <span class="sc">%&gt;%</span></span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(geography) <span class="sc">%&gt;%</span></span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geography)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 1
+  geography    
+  &lt;chr&gt;        
+1 Bronx        
+2 Brooklyn     
+3 Manhattan    
+4 New York City
+5 Queens       
+6 Staten Island</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_clean <span class="sc">%&gt;%</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(geography) <span class="sc">%&gt;%</span></span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">first_year =</span> <span class="fu">min</span>(time_period, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">last_year =</span> <span class="fu">max</span>(time_period, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">observations =</span> <span class="fu">n</span>()</span>
+<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geography)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  geography     first_year last_year observations
+  &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;        &lt;int&gt;
+1 Bronx               2005      2023           19
+2 Brooklyn            2005      2023           19
+3 Manhattan           2005      2023           19
+4 New York City       2005      2023           19
+5 Queens              2005      2023           19
+6 Staten Island       2005      2023           19</code></pre>
+</div>
+</div>
+<p><strong>Geographic and Time Coverage:</strong> The asthma emergency department dataset contains annual data from 2005 through 2023. It includes the five NYC boroughs—Bronx, Brooklyn, Manhattan, Queens, and Staten Island, as well as New York City overall. Each geographic area contains 19 annual observations, allowing asthma-related emergency department utilization to be compared across boroughs and examined over time.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_clean <span class="sc">%&gt;%</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time_period, geography, value, note)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  time_period geography     value note                                          
+        &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt; &lt;chr&gt;                                         
+1        2015 New York City    NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+2        2015 Bronx            NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+3        2015 Brooklyn         NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+4        2015 Manhattan        NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+5        2015 Queens           NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…
+6        2015 Staten Island    NA "†  &lt;strong style=\"color: red;\"&gt;Data from 2…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(asthma_ed_clean<span class="sc">$</span>value))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(asthma_ed_clean<span class="sc">$</span>value)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
+  26.30   58.77   83.20   94.72  111.97  225.10       6 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_clean <span class="sc">%&gt;%</span></span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time_period, geography, value) <span class="sc">%&gt;%</span></span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 3
+   time_period geography value
+         &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;
+ 1        2014 Bronx      225.
+ 2        2013 Bronx      224 
+ 3        2008 Bronx      220.
+ 4        2012 Bronx      218.
+ 5        2009 Bronx      212.
+ 6        2007 Bronx      206.
+ 7        2010 Bronx      199 
+ 8        2016 Bronx      192.
+ 9        2011 Bronx      192.
+10        2006 Bronx      189.</code></pre>
+</div>
+</div>
+<p>Exploratory: The asthma ED visit rates ranged from 26.3 to 225.1 visits per 10,000 people, with six missing observations. The highest observed rates were consistently associated with the Bronx, including the highest rate of 225.1 per 10,000 in 2014. These higher values were retained because they may represent meaningful geographic differences in asthma-related emergency department utilization rather than data errors.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_boroughs <span class="ot">&lt;-</span> asthma_ed_clean <span class="sc">%&gt;%</span></span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>    geography <span class="sc">!=</span> <span class="st">"New York City"</span>,</span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(value)</span>
+<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>  asthma_ed_boroughs,</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(</span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> time_period,</span>
+<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> value,</span>
+<span id="cb104-6"><a href="#cb104-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> geography,</span>
+<span id="cb104-7"><a href="#cb104-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> geography</span>
+<span id="cb104-8"><a href="#cb104-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb104-9"><a href="#cb104-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb104-10"><a href="#cb104-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb104-11"><a href="#cb104-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb104-12"><a href="#cb104-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb104-13"><a href="#cb104-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Adult Asthma Emergency Department Visit Rates by NYC Borough"</span>,</span>
+<span id="cb104-14"><a href="#cb104-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Age-adjusted rates from 2005–2023"</span>,</span>
+<span id="cb104-15"><a href="#cb104-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Year"</span>,</span>
+<span id="cb104-16"><a href="#cb104-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"ED visits per 10,000 people"</span>,</span>
+<span id="cb104-17"><a href="#cb104-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Borough"</span>,</span>
+<span id="cb104-18"><a href="#cb104-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: NYC Environment &amp; Health Data Portal"</span></span>
+<span id="cb104-19"><a href="#cb104-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb104-20"><a href="#cb104-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(</span>
+<span id="cb104-21"><a href="#cb104-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2005</span>, <span class="dv">2023</span>, <span class="at">by =</span> <span class="dv">2</span>)</span>
+<span id="cb104-22"><a href="#cb104-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb104-23"><a href="#cb104-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Asthma_Project3_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Filtering ED visits to 2020 for adjusted prevalence match based on dataset 1</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>asthma_ed_2020 <span class="ot">&lt;-</span> asthma_ed_clean <span class="sc">%&gt;%</span></span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>    time_period <span class="sc">==</span> <span class="dv">2020</span>,</span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>    geography <span class="sc">!=</span> <span class="st">"New York City"</span>,</span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(value)</span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(value))</span>
+<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb105-9"><a href="#cb105-9" aria-hidden="true" tabindex="-1"></a>asthma_ed_2020</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 10
+  geo_id time_period_id value ci    note       geography   lat  long time_period
+   &lt;dbl&gt;          &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt; &lt;chr&gt;      &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;
+1      1             49  96.3 NA    The start… Bronx      40.9 -73.9        2020
+2      2             49  48.9 NA    The start… Brooklyn   40.6 -73.9        2020
+3      3             49  44.7 NA    The start… Manhattan  40.8 -74.0        2020
+4      5             49  35.1 NA    The start… Staten I…  40.6 -74.2        2020
+5      4             49  26.3 NA    The start… Queens     40.7 -73.8        2020
+# ℹ 1 more variable: indicator &lt;chr&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  asthma_ed_2020,</span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(</span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> value,</span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">reorder</span>(geography, value)</span>
+<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb107-7"><a href="#cb107-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb107-8"><a href="#cb107-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb107-9"><a href="#cb107-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb107-10"><a href="#cb107-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(value, <span class="dv">1</span>)),</span>
+<span id="cb107-11"><a href="#cb107-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.15</span>,</span>
+<span id="cb107-12"><a href="#cb107-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">3.5</span></span>
+<span id="cb107-13"><a href="#cb107-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb107-14"><a href="#cb107-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb107-15"><a href="#cb107-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Adult Asthma Emergency Department Visit Rates by NYC Borough"</span>,</span>
+<span id="cb107-16"><a href="#cb107-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Age-adjusted rate per 10,000 people, 2020"</span>,</span>
+<span id="cb107-17"><a href="#cb107-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"ED visits per 10,000 people"</span>,</span>
+<span id="cb107-18"><a href="#cb107-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Borough"</span>,</span>
+<span id="cb107-19"><a href="#cb107-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: NYC Environment &amp; Health Data Portal"</span></span>
+<span id="cb107-20"><a href="#cb107-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb107-21"><a href="#cb107-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(</span>
+<span id="cb107-22"><a href="#cb107-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">max</span>(asthma_ed_2020<span class="sc">$</span>value) <span class="sc">+</span> <span class="dv">15</span></span>
+<span id="cb107-23"><a href="#cb107-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb107-24"><a href="#cb107-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Asthma_Project3_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="findings-1" class="level3">
+<h3 class="anchored" data-anchor-id="findings-1">Findings</h3>
+<p>The 2020 analysis shows differences in age-adjusted adult asthma emergency department visit rates across NYC boroughs. The data were examined for missing values and unusually high observations before comparing borough-level rates. Because emergency department utilization was affected by the COVID-19 pandemic in 2020, these results should be interpreted as a snapshot of asthma-related ED use during an atypical healthcare-utilization period rather than as a measure of asthma prevalence.</p>
+</section>
+</section>
+<section id="dataset-3-adult-asthma-hospitalizations" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-3-adult-asthma-hospitalizations">Dataset 3: Adult Asthma Hospitalizations</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(asthma_hospital_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 107
+Columns: 12
+$ TimePeriod                         &lt;dbl&gt; 2023, 2023, 2023, 2023, 2023, 2023,…
+$ GeoTypePretty                      &lt;chr&gt; "Citywide", "Borough", "Borough", "…
+$ GeoTypeDesc                        &lt;chr&gt; "Citywide", "Borough", "Borough", "…
+$ GeoID                              &lt;dbl&gt; 1, 1, 2, 3, 4, 5, 101, 102, 103, 10…
+$ GeoRank                            &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4,…
+$ BoroID                             &lt;chr&gt; "-", "1", "2", "3", "4", "5", "1", …
+$ Borough                            &lt;chr&gt; "-", "Bronx", "Brooklyn", "Manhatta…
+$ Geography                          &lt;chr&gt; "New York City", "Bronx", "Brooklyn…
+$ Area                               &lt;chr&gt; "New York City", "Bronx", "Brooklyn…
+$ Number                             &lt;chr&gt; "5,498", "1,947", "1,355", "757", "…
+$ `Estimated annual rate per 10,000` &lt;chr&gt; "8.3", "18.8", "6.7", "5.5", "6.4",…
+$ `Age-adjusted rate per 10,000`     &lt;chr&gt; "8.0", "18.3", "6.6", "5.4", "6.1",…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(asthma_hospital_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 107  12</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(asthma_hospital_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "TimePeriod"                       "GeoTypePretty"                   
+ [3] "GeoTypeDesc"                      "GeoID"                           
+ [5] "GeoRank"                          "BoroID"                          
+ [7] "Borough"                          "Geography"                       
+ [9] "Area"                             "Number"                          
+[11] "Estimated annual rate per 10,000" "Age-adjusted rate per 10,000"    </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(asthma_hospital_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 107
+Columns: 12
+$ TimePeriod                         &lt;dbl&gt; 2023, 2023, 2023, 2023, 2023, 2023,…
+$ GeoTypePretty                      &lt;chr&gt; "Citywide", "Borough", "Borough", "…
+$ GeoTypeDesc                        &lt;chr&gt; "Citywide", "Borough", "Borough", "…
+$ GeoID                              &lt;dbl&gt; 1, 1, 2, 3, 4, 5, 101, 102, 103, 10…
+$ GeoRank                            &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4,…
+$ BoroID                             &lt;chr&gt; "-", "1", "2", "3", "4", "5", "1", …
+$ Borough                            &lt;chr&gt; "-", "Bronx", "Brooklyn", "Manhatta…
+$ Geography                          &lt;chr&gt; "New York City", "Bronx", "Brooklyn…
+$ Area                               &lt;chr&gt; "New York City", "Bronx", "Brooklyn…
+$ Number                             &lt;chr&gt; "5,498", "1,947", "1,355", "757", "…
+$ `Estimated annual rate per 10,000` &lt;chr&gt; "8.3", "18.8", "6.7", "5.5", "6.4",…
+$ `Age-adjusted rate per 10,000`     &lt;chr&gt; "8.0", "18.3", "6.6", "5.4", "6.1",…</code></pre>
+</div>
+</div>
+<p><strong>Preliminary Finding:</strong> The 2020 analysis shows differences in age-adjusted adult asthma emergency department visit rates across NYC boroughs. The data were examined for missing values and unusually high observations before comparing borough-level rates. Because emergency department utilization was affected by the COVID-19 pandemic in 2020, these results should be interpreted as a snapshot of asthma-related ED use during an atypical healthcare-utilization period rather than as a measure of asthma prevalence.</p>
+<section id="cleaning-the-dataset-2" class="level3">
+<h3 class="anchored" data-anchor-id="cleaning-the-dataset-2">Cleaning the dataset</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>asthma_hospital_clean <span class="ot">&lt;-</span> asthma_hospital_raw <span class="sc">%&gt;%</span></span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">number_numeric =</span> readr<span class="sc">::</span><span class="fu">parse_number</span>(number),</span>
+<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">annual_rate_numeric =</span></span>
+<span id="cb116-6"><a href="#cb116-6" aria-hidden="true" tabindex="-1"></a>      readr<span class="sc">::</span><span class="fu">parse_number</span>(estimated_annual_rate_per_10_000),</span>
+<span id="cb116-7"><a href="#cb116-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_adjusted_rate_numeric =</span></span>
+<span id="cb116-8"><a href="#cb116-8" aria-hidden="true" tabindex="-1"></a>      readr<span class="sc">::</span><span class="fu">parse_number</span>(age_adjusted_rate_per_10_000)</span>
+<span id="cb116-9"><a href="#cb116-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(asthma_hospital_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "time_period"                      "geo_type_pretty"                 
+ [3] "geo_type_desc"                    "geo_id"                          
+ [5] "geo_rank"                         "boro_id"                         
+ [7] "borough"                          "geography"                       
+ [9] "area"                             "number"                          
+[11] "estimated_annual_rate_per_10_000" "age_adjusted_rate_per_10_000"    
+[13] "number_numeric"                   "annual_rate_numeric"             
+[15] "age_adjusted_rate_numeric"       </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>asthma_hospital_clean <span class="sc">%&gt;%</span></span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(time_period) <span class="sc">%&gt;%</span></span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time_period)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  time_period     n
+        &lt;dbl&gt; &lt;int&gt;
+1        2023   107</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>asthma_hospital_2023 <span class="ot">&lt;-</span> asthma_hospital_clean <span class="sc">%&gt;%</span></span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>    time_period <span class="sc">==</span> <span class="dv">2023</span>,</span>
+<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>    geo_type_pretty <span class="sc">==</span> <span class="st">"UHF42"</span>,</span>
+<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(age_adjusted_rate_numeric)</span>
+<span id="cb121-6"><a href="#cb121-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb121-7"><a href="#cb121-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(age_adjusted_rate_numeric))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(asthma_hospital_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "time_period"                      "geo_type_pretty"                 
+ [3] "geo_type_desc"                    "geo_id"                          
+ [5] "geo_rank"                         "boro_id"                         
+ [7] "borough"                          "geography"                       
+ [9] "area"                             "number"                          
+[11] "estimated_annual_rate_per_10_000" "age_adjusted_rate_per_10_000"    
+[13] "number_numeric"                   "annual_rate_numeric"             
+[15] "age_adjusted_rate_numeric"       </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(asthma_hospital_clean)[</span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grepl</span>(<span class="st">"age_adjusted"</span>, <span class="fu">names</span>(asthma_hospital_clean))</span>
+<span id="cb124-3"><a href="#cb124-3" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "age_adjusted_rate_per_10_000" "age_adjusted_rate_numeric"   </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>asthma_hospital_clean <span class="ot">&lt;-</span> asthma_hospital_clean <span class="sc">%&gt;%</span></span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb126-3"><a href="#cb126-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_adjusted_rate_numeric =</span></span>
+<span id="cb126-4"><a href="#cb126-4" aria-hidden="true" tabindex="-1"></a>      readr<span class="sc">::</span><span class="fu">parse_number</span>(age_adjusted_rate_per_10_000)</span>
+<span id="cb126-5"><a href="#cb126-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb127"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>asthma_hospital_clean <span class="sc">%&gt;%</span></span>
+<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb127-3"><a href="#cb127-3" aria-hidden="true" tabindex="-1"></a>    time_period,</span>
+<span id="cb127-4"><a href="#cb127-4" aria-hidden="true" tabindex="-1"></a>    geography,</span>
+<span id="cb127-5"><a href="#cb127-5" aria-hidden="true" tabindex="-1"></a>    age_adjusted_rate_per_10_000,</span>
+<span id="cb127-6"><a href="#cb127-6" aria-hidden="true" tabindex="-1"></a>    age_adjusted_rate_numeric</span>
+<span id="cb127-7"><a href="#cb127-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb127-8"><a href="#cb127-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  time_period geography     age_adjusted_rate_per_10_000 age_adjusted_rate_num…¹
+        &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt;                                          &lt;dbl&gt;
+1        2023 New York City 8.0                                              8  
+2        2023 Bronx         18.3                                            18.3
+3        2023 Brooklyn      6.6                                              6.6
+4        2023 Manhattan     5.4                                              5.4
+5        2023 Queens        6.1                                              6.1
+6        2023 Staten Island 6.8                                              6.8
+# ℹ abbreviated name: ¹​age_adjusted_rate_numeric</code></pre>
+</div>
+</div>
+</section>
+<section id="analysis-2" class="level3">
+<h3 class="anchored" data-anchor-id="analysis-2">Analysis</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb129"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a>asthma_hospital_2023 <span class="ot">&lt;-</span> asthma_hospital_clean <span class="sc">%&gt;%</span></span>
+<span id="cb129-2"><a href="#cb129-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb129-3"><a href="#cb129-3" aria-hidden="true" tabindex="-1"></a>    time_period <span class="sc">==</span> <span class="dv">2023</span>,</span>
+<span id="cb129-4"><a href="#cb129-4" aria-hidden="true" tabindex="-1"></a>    geo_type_pretty <span class="sc">==</span> <span class="st">"UHF42"</span>,</span>
+<span id="cb129-5"><a href="#cb129-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(age_adjusted_rate_numeric)</span>
+<span id="cb129-6"><a href="#cb129-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb129-7"><a href="#cb129-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(age_adjusted_rate_numeric))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(asthma_hospital_2023)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 42</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a>asthma_hospital_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb132-2"><a href="#cb132-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb132-3"><a href="#cb132-3" aria-hidden="true" tabindex="-1"></a>    borough,</span>
+<span id="cb132-4"><a href="#cb132-4" aria-hidden="true" tabindex="-1"></a>    geography,</span>
+<span id="cb132-5"><a href="#cb132-5" aria-hidden="true" tabindex="-1"></a>    age_adjusted_rate_numeric</span>
+<span id="cb132-6"><a href="#cb132-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb132-7"><a href="#cb132-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 3
+   borough       geography                            age_adjusted_rate_numeric
+   &lt;chr&gt;         &lt;chr&gt;                                                    &lt;dbl&gt;
+ 1 Bronx         Hunts Point - Mott Haven                                  22.9
+ 2 Bronx         Crotona - Tremont                                         19.8
+ 3 Bronx         Pelham - Throgs Neck                                      18.8
+ 4 Bronx         Northeast Bronx                                           18.7
+ 5 Bronx         Fordham - Bronx Pk                                        18.4
+ 6 Bronx         High Bridge - Morrisania                                  16.9
+ 7 Staten Island Port Richmond                                             12.7
+ 8 Manhattan     East Harlem                                               12.5
+ 9 Manhattan     Central Harlem - Morningside Heights                      12.2
+10 Brooklyn      Bedford Stuyvesant - Crown Heights                        11.3</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb134"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a>asthma_hospital_top10 <span class="ot">&lt;-</span> asthma_hospital_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb134-2"><a href="#cb134-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span>
+<span id="cb134-3"><a href="#cb134-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb134-4"><a href="#cb134-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb134-5"><a href="#cb134-5" aria-hidden="true" tabindex="-1"></a>  asthma_hospital_top10,</span>
+<span id="cb134-6"><a href="#cb134-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(</span>
+<span id="cb134-7"><a href="#cb134-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> age_adjusted_rate_numeric,</span>
+<span id="cb134-8"><a href="#cb134-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">reorder</span>(geography, age_adjusted_rate_numeric)</span>
+<span id="cb134-9"><a href="#cb134-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb134-10"><a href="#cb134-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb134-11"><a href="#cb134-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb134-12"><a href="#cb134-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb134-13"><a href="#cb134-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> age_adjusted_rate_numeric),</span>
+<span id="cb134-14"><a href="#cb134-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.15</span>,</span>
+<span id="cb134-15"><a href="#cb134-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">3.5</span></span>
+<span id="cb134-16"><a href="#cb134-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb134-17"><a href="#cb134-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb134-18"><a href="#cb134-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"NYC Areas with the Highest Adult Asthma Hospitalization Rates"</span>,</span>
+<span id="cb134-19"><a href="#cb134-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Top 10 UHF42 areas based on age-adjusted rates, 2023"</span>,</span>
+<span id="cb134-20"><a href="#cb134-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Hospitalizations per 10,000 people"</span>,</span>
+<span id="cb134-21"><a href="#cb134-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"UHF42 Area"</span>,</span>
+<span id="cb134-22"><a href="#cb134-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: NYC Environment &amp; Health Data Portal"</span></span>
+<span id="cb134-23"><a href="#cb134-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb134-24"><a href="#cb134-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(</span>
+<span id="cb134-25"><a href="#cb134-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">max</span>(asthma_hospital_top10<span class="sc">$</span>age_adjusted_rate_numeric) <span class="sc">+</span> <span class="dv">3</span></span>
+<span id="cb134-26"><a href="#cb134-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb134-27"><a href="#cb134-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Asthma_Project3_files/figure-html/unnamed-chunk-65-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="findings-2" class="level3">
+<h3 class="anchored" data-anchor-id="findings-2">Findings</h3>
+<p>Adult asthma hospitalization rates varied across NYC UHF42 areas in 2023. Hunts Point–Mott Haven had the highest age-adjusted hospitalization rate at 22.9 per 10,000, followed by Crotona–Tremont at 19.8 and Pelham–Throgs Neck at 18.8. The six areas with the highest hospitalization rates were all located in the Bronx, indicating a clear geographic concentration of higher asthma-related hospitalization rates.</p>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>Across the three datasets, asthma burden varied across New York City, with several Bronx communities consistently showing higher rates. In 2020, East Harlem had the highest age-adjusted asthma prevalence, while the Bronx had the highest asthma emergency department visit rate. In 2023, the highest hospitalization rates were concentrated in the Bronx, led by Hunts Point–Mott Haven. The recurrence of higher rates in certain communities suggests that asthma burden may be concentrated in specific areas rather than evenly distributed throughout the city. These findings also identify communities that may benefit from further analysis to better understand the factors associated with higher asthma burden. The findings suggest geographic disparities in asthma burden across NYC. However, because the datasets use different years and geographic levels, the results should be viewed as complementary patterns rather than direct comparisons.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
