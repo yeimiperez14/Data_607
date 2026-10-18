@@ -1,0 +1,108 @@
+TimePeriod,GeoTypePretty,GeoTypeDesc,GeoID,GeoRank,BoroID,Borough,Geography,Area,Number,"Estimated annual rate per 10,000","Age-adjusted rate per 10,000"
+2023,Citywide,Citywide,1,0,-,-,New York City,New York City,"5,498",8.3,8.0
+2023,Borough,Borough,1,1,1,Bronx,Bronx,Bronx,"1,947",18.8,18.3
+2023,Borough,Borough,2,1,2,Brooklyn,Brooklyn,Brooklyn,"1,355",6.7,6.6
+2023,Borough,Borough,3,1,3,Manhattan,Manhattan,Manhattan,757,5.5,5.4
+2023,Borough,Borough,4,1,4,Queens,Queens,Queens,"1,163",6.4,6.1
+2023,Borough,Borough,5,1,5,Staten Island,Staten Island,Staten Island,276,7.1,6.8
+2023,UHF42,UHF 42,101,4,1,Bronx,Kingsbridge - Riverdale,Kingsbridge - Riverdale  Bronx,51,7.1,6.5
+2023,UHF42,UHF 42,102,4,1,Bronx,Northeast Bronx,Northeast Bronx  Bronx,303,19.5,18.7
+2023,UHF42,UHF 42,103,4,1,Bronx,Fordham - Bronx Pk,Fordham - Bronx Pk  Bronx,341,18.5,18.4
+2023,UHF42,UHF 42,104,4,1,Bronx,Pelham - Throgs Neck,Pelham - Throgs Neck  Bronx,430,19.4,18.8
+2023,UHF42,UHF 42,105,4,1,Bronx,Crotona - Tremont,Crotona - Tremont  Bronx,299,19.9,19.8
+2023,UHF42,UHF 42,106,4,1,Bronx,High Bridge - Morrisania,High Bridge - Morrisania  Bronx,262,17.2,16.9
+2023,UHF42,UHF 42,107,4,1,Bronx,Hunts Point - Mott Haven,Hunts Point - Mott Haven  Bronx,235,23.0,22.9
+2023,UHF42,UHF 42,201,4,2,Brooklyn,Greenpoint,Greenpoint  Brooklyn,38,3.4,3.9
+2023,UHF42,UHF 42,202,4,2,Brooklyn,Downtown - Heights - Slope,Downtown - Heights - Slope  Brooklyn,142,6.6,7.4
+2023,UHF42,UHF 42,203,4,2,Brooklyn,Bedford Stuyvesant - Crown Heights,Bedford Stuyvesant - Crown Heights  Brooklyn,301,11.1,11.3
+2023,UHF42,UHF 42,204,4,2,Brooklyn,East New York,East New York  Brooklyn,148,10.0,10.0
+2023,UHF42,UHF 42,205,4,2,Brooklyn,Sunset Park,Sunset Park  Brooklyn,47,5.1,5.3
+2023,UHF42,UHF 42,206,4,2,Brooklyn,Borough Park,Borough Park  Brooklyn,55,2.4,2.2
+2023,UHF42,UHF 42,207,4,2,Brooklyn,East Flatbush - Flatbush,East Flatbush - Flatbush  Brooklyn,186,8.1,7.6
+2023,UHF42,UHF 42,208,4,2,Brooklyn,Canarsie - Flatlands,Canarsie - Flatlands  Brooklyn,125,7.9,7.8
+2023,UHF42,UHF 42,209,4,2,Brooklyn,Bensonhurst - Bay Ridge,Bensonhurst - Bay Ridge  Brooklyn,42,2.6,2.4
+2023,UHF42,UHF 42,210,4,2,Brooklyn,Coney Island - Sheepshead Bay,Coney Island - Sheepshead Bay  Brooklyn,120,5.3,5.1
+2023,UHF42,UHF 42,211,4,2,Brooklyn,Williamsburg - Bushwick,Williamsburg - Bushwick  Brooklyn,135,8.1,8.4
+2023,UHF42,UHF 42,301,4,3,Manhattan,Washington Heights,Washington Heights  Manhattan,143,6.9,6.7
+2023,UHF42,UHF 42,302,4,3,Manhattan,Central Harlem - Morningside Heights,Central Harlem - Morningside Heights  Manhattan,177,12.0,12.2
+2023,UHF42,UHF 42,303,4,3,Manhattan,East Harlem,East Harlem  Manhattan,114,12.8,12.5
+2023,UHF42,UHF 42,304,4,3,Manhattan,Upper West Side,Upper West Side  Manhattan,85,4.4,4.2
+2023,UHF42,UHF 42,305,4,3,Manhattan,Upper East Side,Upper East Side  Manhattan,31,1.7,1.5
+2023,UHF42,UHF 42,306,4,3,Manhattan,Chelsea - Clinton,Chelsea - Clinton  Manhattan,36,2.5,2.6
+2023,UHF42,UHF 42,307,4,3,Manhattan,Gramercy Park - Murray Hill,Gramercy Park - Murray Hill  Manhattan,31,2.5,2.8
+2023,UHF42,UHF 42,308,4,3,Manhattan,Greenwich Village - SoHo,Greenwich Village - SoHo  Manhattan,8*,1.1*,1.0*
+2023,UHF42,UHF 42,309,4,3,Manhattan,Union Square - Lower East Side,Union Square - Lower East Side  Manhattan,104,6.3,6.1
+2023,UHF42,UHF 42,310,4,3,Manhattan,Lower Manhattan,Lower Manhattan  Manhattan,13,2.4,2.8
+2023,UHF42,UHF 42,401,4,4,Queens,Long Island City - Astoria,Long Island City - Astoria  Queens,101,6.0,5.8
+2023,UHF42,UHF 42,402,4,4,Queens,West Queens,West Queens  Queens,185,5.2,4.9
+2023,UHF42,UHF 42,403,4,4,Queens,Flushing - Clearview,Flushing - Clearview  Queens,80,3.8,3.6
+2023,UHF42,UHF 42,404,4,4,Queens,Bayside - Little Neck,Bayside - Little Neck  Queens,30,4.1,4.0
+2023,UHF42,UHF 42,405,4,4,Queens,Ridgewood - Forest Hills,Ridgewood - Forest Hills  Queens,81,3.9,3.7
+2023,UHF42,UHF 42,406,4,4,Queens,Fresh Meadows,Fresh Meadows  Queens,29,3.7,3.5
+2023,UHF42,UHF 42,407,4,4,Queens,Southwest Queens,Southwest Queens  Queens,141,6.6,6.4
+2023,UHF42,UHF 42,408,4,4,Queens,Jamaica,Jamaica  Queens,228,9.0,8.5
+2023,UHF42,UHF 42,409,4,4,Queens,Southeast Queens,Southeast Queens  Queens,112,6.5,6.1
+2023,UHF42,UHF 42,410,4,4,Queens,Rockaways,Rockaways  Queens,88,8.9,8.6
+2023,UHF42,UHF 42,501,4,5,Staten Island,Port Richmond,Port Richmond  Staten Island,68,12.7,12.7
+2023,UHF42,UHF 42,502,4,5,Staten Island,Stapleton - St. George,Stapleton - St. George  Staten Island,106,10.4,9.6
+2023,UHF42,UHF 42,503,4,5,Staten Island,Willowbrook,Willowbrook  Staten Island,41,5.4,4.9
+2023,UHF42,UHF 42,504,4,5,Staten Island,South Beach - Tottenville,South Beach - Tottenville  Staten Island,57,3.7,3.5
+2023,CD,Community District,201,6,1,Bronx,Mott Haven and Melrose (CD1),Mott Haven and Melrose (CD1)  Bronx,172,25.6,25.4
+2023,CD,Community District,202,6,1,Bronx,Hunts Point and Longwood (CD2),Hunts Point and Longwood (CD2)  Bronx,71,18.5,18.4
+2023,CD,Community District,203,6,1,Bronx,Morrisania and Crotona (CD3),Morrisania and Crotona (CD3)  Bronx,137,22.4,22.4
+2023,CD,Community District,204,6,1,Bronx,Highbridge and Concourse (CD4),Highbridge and Concourse (CD4)  Bronx,159,14.6,14.3
+2023,CD,Community District,205,6,1,Bronx,Fordham and University Heights (CD5),Fordham and University Heights (CD5)  Bronx,147,15.9,15.8
+2023,CD,Community District,206,6,1,Bronx,Belmont and East Tremont (CD6),Belmont and East Tremont (CD6)  Bronx,154,26.3,26.7
+2023,CD,Community District,207,6,1,Bronx,Kingsbridge Heights and Bedford (CD7),Kingsbridge Heights and Bedford (CD7)  Bronx,178,17.1,17.1
+2023,CD,Community District,208,6,1,Bronx,Riverdale and Fieldston (CD8),Riverdale and Fieldston (CD8)  Bronx,62,8.0,7.2
+2023,CD,Community District,209,6,1,Bronx,Parkchester and Soundview (CD9),Parkchester and Soundview (CD9)  Bronx,266,19.7,18.8
+2023,CD,Community District,210,6,1,Bronx,Throgs Neck and Co-op City (CD10),Throgs Neck and Co-op City (CD10)  Bronx,129,13.8,13.4
+2023,CD,Community District,211,6,1,Bronx,Morris Park and Bronxdale (CD11),Morris Park and Bronxdale (CD11)  Bronx,183,21.4,20.5
+2023,CD,Community District,212,6,1,Bronx,Williamsbridge and Baychester (CD12),Williamsbridge and Baychester (CD12)  Bronx,263,22.9,22.2
+2023,CD,Community District,301,6,2,Brooklyn,Greenpoint and Williamsburg (CD1),Greenpoint and Williamsburg (CD1)  Brooklyn,62,4.1,4.7
+2023,CD,Community District,302,6,2,Brooklyn,Fort Greene and Brooklyn Heights (CD2),Fort Greene and Brooklyn Heights (CD2)  Brooklyn,82,7.2,7.7
+2023,CD,Community District,303,6,2,Brooklyn,Bedford Stuyvesant (CD3),Bedford Stuyvesant (CD3)  Brooklyn,129,11.6,11.6
+2023,CD,Community District,304,6,2,Brooklyn,Bushwick (CD4),Bushwick (CD4)  Brooklyn,69,8.4,8.5
+2023,CD,Community District,305,6,2,Brooklyn,East New York and Starrett City (CD5),East New York and Starrett City (CD5)  Brooklyn,146,11.4,11.4
+2023,CD,Community District,306,6,2,Brooklyn,Park Slope and Carroll Gardens (CD6),Park Slope and Carroll Gardens (CD6)  Brooklyn,54,6.0,7.5
+2023,CD,Community District,307,6,2,Brooklyn,Sunset Park (CD7),Sunset Park (CD7)  Brooklyn,51,5.0,5.3
+2023,CD,Community District,308,6,2,Brooklyn,Crown Heights and Prospect Heights (CD8),Crown Heights and Prospect Heights (CD8)  Brooklyn,82,10.8,11.4
+2023,CD,Community District,309,6,2,Brooklyn,South Crown Heights and Lefferts Gardens (CD9),South Crown Heights and Lefferts Gardens (CD9)  Brooklyn,70,9.3,9.0
+2023,CD,Community District,310,6,2,Brooklyn,Bay Ridge and Dyker Heights (CD10),Bay Ridge and Dyker Heights (CD10)  Brooklyn,30,2.6,2.5
+2023,CD,Community District,311,6,2,Brooklyn,Bensonhurst (CD11),Bensonhurst (CD11)  Brooklyn,26,1.6,1.5
+2023,CD,Community District,312,6,2,Brooklyn,Borough Park (CD12),Borough Park (CD12)  Brooklyn,25,1.9,1.8
+2023,CD,Community District,313,6,2,Brooklyn,Coney Island (CD13),Coney Island (CD13)  Brooklyn,84,9.5,9.6
+2023,CD,Community District,314,6,2,Brooklyn,Flatbush and Midwood (CD14),Flatbush and Midwood (CD14)  Brooklyn,72,5.9,5.5
+2023,CD,Community District,315,6,2,Brooklyn,Sheepshead Bay (CD15),Sheepshead Bay (CD15)  Brooklyn,35,2.5,2.3
+2023,CD,Community District,316,6,2,Brooklyn,Brownsville (CD16),Brownsville (CD16)  Brooklyn,106,18.1,17.7
+2023,CD,Community District,317,6,2,Brooklyn,East Flatbush (CD17),East Flatbush (CD17)  Brooklyn,108,9.1,8.6
+2023,CD,Community District,318,6,2,Brooklyn,Flatlands and Canarsie (CD18),Flatlands and Canarsie (CD18)  Brooklyn,108,7.5,7.3
+2023,CD,Community District,101,6,3,Manhattan,Financial District (CD1),Financial District (CD1)  Manhattan,8*,1.5*,2.1*
+2023,CD,Community District,102,6,3,Manhattan,Greenwich Village and Soho (CD2),Greenwich Village and Soho (CD2)  Manhattan,7*,0.9*,0.8*
+2023,CD,Community District,103,6,3,Manhattan,Lower East Side and Chinatown (CD3),Lower East Side and Chinatown (CD3)  Manhattan,104,7.1,6.6
+2023,CD,Community District,104,6,3,Manhattan,Clinton and Chelsea (CD4),Clinton and Chelsea (CD4)  Manhattan,31,2.4,2.5
+2023,CD,Community District,105,6,3,Manhattan,Midtown (CD5),Midtown (CD5)  Manhattan,9*,1.6*,1.6*
+2023,CD,Community District,106,6,3,Manhattan,Stuyvesant Town and Turtle Bay (CD6),Stuyvesant Town and Turtle Bay (CD6)  Manhattan,33,2.6,2.8
+2023,CD,Community District,107,6,3,Manhattan,Upper West Side (CD7),Upper West Side (CD7)  Manhattan,79,4.5,4.5
+2023,CD,Community District,108,6,3,Manhattan,Upper East Side (CD8),Upper East Side (CD8)  Manhattan,31,1.7,1.5
+2023,CD,Community District,109,6,3,Manhattan,Morningside Heights and Hamilton Heights (CD9),Morningside Heights and Hamilton Heights (CD9)  Manhattan,75,8.6,9.0
+2023,CD,Community District,110,6,3,Manhattan,Central Harlem (CD10),Central Harlem (CD10)  Manhattan,136,15.2,15.7
+2023,CD,Community District,111,6,3,Manhattan,East Harlem (CD11),East Harlem (CD11)  Manhattan,129,13.7,13.4
+2023,CD,Community District,112,6,3,Manhattan,Washington Heights and Inwood (CD12),Washington Heights and Inwood (CD12)  Manhattan,100,6.7,6.4
+2023,CD,Community District,401,6,4,Queens,Long Island City and Astoria (CD1),Long Island City and Astoria (CD1)  Queens,103,6.6,6.4
+2023,CD,Community District,402,6,4,Queens,Woodside and Sunnyside (CD2),Woodside and Sunnyside (CD2)  Queens,41,3.3,3.1
+2023,CD,Community District,403,6,4,Queens,Jackson Heights (CD3),Jackson Heights (CD3)  Queens,68,5.0,4.9
+2023,CD,Community District,404,6,4,Queens,Elmhurst and Corona (CD4),Elmhurst and Corona (CD4)  Queens,61,4.2,3.9
+2023,CD,Community District,405,6,4,Queens,Ridgewood and Maspeth (CD5),Ridgewood and Maspeth (CD5)  Queens,63,5.2,5.0
+2023,CD,Community District,406,6,4,Queens,Rego Park and Forest Hills (CD6),Rego Park and Forest Hills (CD6)  Queens,31,3.3,2.8
+2023,CD,Community District,407,6,4,Queens,Flushing and Whitestone (CD7),Flushing and Whitestone (CD7)  Queens,77,3.5,3.3
+2023,CD,Community District,408,6,4,Queens,Hillcrest and Fresh Meadows (CD8),Hillcrest and Fresh Meadows (CD8)  Queens,66,5.4,5.0
+2023,CD,Community District,409,6,4,Queens,Kew Gardens and Woodhaven (CD9),Kew Gardens and Woodhaven (CD9)  Queens,81,7.4,7.1
+2023,CD,Community District,410,6,4,Queens,South Ozone Park and Howard Beach (CD10),South Ozone Park and Howard Beach (CD10)  Queens,62,6.5,6.3
+2023,CD,Community District,411,6,4,Queens,Bayside and Little Neck (CD11),Bayside and Little Neck (CD11)  Queens,36,3.8,3.7
+2023,CD,Community District,412,6,4,Queens,Jamaica and Hollis (CD12),Jamaica and Hollis (CD12)  Queens,191,10.7,10.1
+2023,CD,Community District,413,6,4,Queens,Queens Village (CD13),Queens Village (CD13)  Queens,106,6.9,6.7
+2023,CD,Community District,414,6,4,Queens,Rockaway and Broad Channel (CD14),Rockaway and Broad Channel (CD14)  Queens,88,10.8,10.4
+2023,CD,Community District,501,6,5,Staten Island,St. George and Stapleton (CD1),St. George and Stapleton (CD1)  Staten Island,145,9.8,9.6
+2023,CD,Community District,502,6,5,Staten Island,South Beach and Willowbrook (CD2),South Beach and Willowbrook (CD2)  Staten Island,86,7.5,6.8
+2023,CD,Community District,503,6,5,Staten Island,Tottenville and Great Kills (CD3),Tottenville and Great Kills (CD3)  Staten Island,41,3.3,3.1
