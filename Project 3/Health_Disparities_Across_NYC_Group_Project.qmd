@@ -1,0 +1,2784 @@
+---
+title: "Health Disparities Across New York City: Asthma, Diabetes, and High Blood Pressure"
+format: html
+editor: visual
+---
+
+# Project 3: Team Approach
+
+## Group Members
+
+The following students are participating in this project:
+
+- Arauca I. Melendez
+
+- Yeimi M. Perez
+
+- Marlon Nurse
+
+# Project Overview
+
+Our project will examine differences in asthma, diabetes, and high blood pressure across New York City neighborhoods. We chose this topic because these health conditions affect many people, and we want to understand how reported rates differ by neighborhood and borough.
+
+Our main research question is: **How do asthma, diabetes, and high blood pressure rates vary across New York City neighborhoods, and which communities experience the greatest health burdens?**
+
+We plan to compare health estimates across neighborhoods and boroughs, depending on the availability and comparability of the data. We will look for patterns across the three conditions without assuming that one factor directly causes another.
+
+# Collaboration Plan
+
+We plan to use the following tools to communicate and complete the project:
+
+- **Slack:** To communicate, share updates, and coordinate meetings.
+
+- **GitHub:** To store and share code, track changes, and review each other's work.
+
+- **R and Quarto:** To clean, analyze, and document the data in a reproducible format.
+
+We will divide the initial research and data preparation tasks. We will review each other's work and combine the individual contributions into one final project.
+
+# Data Sources
+
+We plan to investigate the following sources:
+
+**Source 1: NYC Environment & Health Data Portal**
+
+Website: <https://a816-dohbesp.nyc.gov/IndicatorPublic/>
+
+Potential use: Find NYC-specific information on asthma and other neighborhood health indicators.
+
+**Source 2: CDC PLACES**
+
+Website: <https://www.cdc.gov/places/tools/data-portal.html>
+
+Potential use: Find local estimates for diabetes and high blood pressure if comparable NYC neighborhood-level data are not available from the first source.
+
+We will review the available files, geographic units, years, and measurement definitions before deciding which datasets to use. We plan to download the data in CSV format when available and load it into R for cleaning and analysis.
+
+## Research Focus Areas
+
+Our project will focus on three health conditions: asthma, diabetes, and high blood pressure. Each condition will be examined separately before we compare the findings across NYC neighborhoods and boroughs.
+
+**Focus Area 1: Asthma**
+
+This section will examine asthma rates across NYC neighborhoods and boroughs. We will look for differences in reported asthma prevalence and, if the data are available, asthma-related emergency department visits or hospitalizations.
+
+**Focus Area 2: Diabetes**
+
+This section will examine diabetes rates across NYC neighborhoods and boroughs. We will compare available estimates to identify which communities report higher rates of diabetes and how the patterns vary by location.
+
+**Focus Area 3: High Blood Pressure**
+
+This section will examine high blood pressure rates across NYC neighborhoods and boroughs. We will compare available estimates to identify differences between communities and look for patterns that may overlap with the findings for asthma and diabetes.
+
+**Overall Comparison**
+
+After examining each condition separately, we will compare the findings to identify neighborhoods that experience higher reported rates across multiple conditions. The comparisons will depend on the availability of compatible data, including geographic areas, years, and measurement definitions.
+
+## Database Design
+
+We propose organizing the information into three related tables.
+
+**Table 1: Neighborhoods**
+
+- neighborhood_id (Primary Key)
+
+- neighborhood_name
+
+- borough
+
+**Table 2: HealthConditions**
+
+- condition_id (Primary Key)
+
+- condition_name
+
+**Table 3: HealthEstimates**
+
+- estimate_id (Primary Key)
+
+- neighborhood_id (Foreign Key)
+
+- condition_id (Foreign Key)
+
+- year
+
+- estimate_value
+
+- measure_unit
+
+The Neighborhoods table will store information about each neighborhood. The HealthConditions table will identify the condition being measured. The HealthEstimates table will connect each neighborhood to its health measurements for a particular year.
+
+This is a preliminary design and may be adjusted after we review the actual datasets.
+
+## Preliminary Entity-Relationship (ER) Diagram
+
+Our proposed relationships are:
+
+- One neighborhood can have many health estimates.
+
+- One health condition can appear in many health estimates.
+
+- Each health estimate belongs to one neighborhood and one health condition.
+
+We will use these relationships to create an ER diagram showing the primary keys, foreign keys, and connections between the tables.
+
+## Preliminary Work Plan
+
+1.  Locate and review the datasets for asthma, diabetes, and high blood pressure.
+
+2.  Confirm that the datasets use compatible geographic units and measurement periods.
+
+3.  Import the selected files into R.
+
+4.  Clean and standardize column names, neighborhood identifiers, and measurement values.
+
+5.  Develop the database structure and ER diagram.
+
+6.  Combine the data where appropriate and explore differences across neighborhoods.
+
+7.  Review the results as a group and prepare the final project and presentation.
+
+## Expected Outcome
+
+We expect to produce a cleaned and organized dataset that supports comparisons of asthma, diabetes, and high blood pressure across NYC neighborhoods. The final project will summarize the patterns found in the data and explain any limitations, including differences in the available years or measurement methods.
+
+# Asthma
+
+## Introduction/Approach
+
+For my(Yeimi Perez) portion of the group project, I will focus on adult asthma (age 16+) across New York City. I will use three datasets from the NYC Environment & Health Data Portal: adults with asthma, asthma-related emergency department visits, and asthma-related hospitalizations. These datasets will allow me to examine asthma burden from different perspectives and identify patterns across NYC communities.
+
+I will clean and prepare the data in R, examine missing values and potential outliers, and perform exploratory analysis. I will compare asthma estimates across geographic areas and, where available, examine trends over time. The cleaned asthma data will then be incorporated into the group’s relational database and compared with the diabetes and high blood pressure findings.
+
+## Analysis Questions
+
+**Individual intake on Asthma prevalence across NYC:**
+
+How does asthma burden vary across NYC neighborhoods and boroughs, and which communities have the highest rates of asthma-related emergency department visits and hospitalizations?
+
+Source: <https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/asthma/>
+
+<https://github.com/yeimiperez14/Data_607/tree/main/Project%203>
+
+**Group Project connection question:**
+
+How do asthma, diabetes, and high blood pressure rates vary across New York City neighborhoods, and which communities experience the greatest health burdens?
+
+**Comparable Asthma Measures to be used:**
+
+|                   |                      |
+|-------------------|----------------------|
+| Asthma prevalence | How common asthma is |
+
+|                      |                               |
+|----------------------|-------------------------------|
+| Asthma ED visit rate | Indicates acute asthma burden |
+
+|                             |                                |
+|-----------------------------|--------------------------------|
+| Asthma hospitalization rate | Indicates more severe outcomes |
+
+**Important note on dataset:** The three asthma datasets may not use identical geographic boundaries or reporting periods. The NYC Environment & Health Data Portal provides indicators using different geographic definitions, including United Hospital Fund (UHF) neighborhoods and Neighborhood Tabulation Areas (NTAs), depending on the underlying data source. Reporting years may also differ across asthma prevalence, emergency department visits, and hospitalizations. These differences will be reviewed during data preparation and considered when comparing results across the three asthma measures.
+
+# Process
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(jsonlite)
+
+# GitHub API URL for your Project 3 folder
+github_api <- paste0(
+  "https://api.github.com/repos/",
+  "yeimiperez14/Data_607/contents/Project%203"
+)
+
+# Retrieve the files in the folder
+github_files <- fromJSON(github_api)
+
+# Display available CSV files
+github_files %>%
+  filter(str_detect(name, regex("\\.csv$", ignore_case = TRUE))) %>%
+  select(name, download_url)
+```
+
+```{r}
+csv_files <- github_files %>%
+  filter(str_detect(
+    name, regex("\\.csv$", ignore_case = TRUE)
+  ))
+
+# Function to find exactly one matching dataset
+get_csv_url <- function(pattern) {
+  
+  matches <- csv_files %>%
+    filter(str_detect(
+      name, regex(pattern, ignore_case = TRUE)
+    ))
+  
+  if (nrow(matches) != 1) {
+    stop(
+      "Expected one matching file for: ",
+      pattern,
+      ". Check the filenames."
+    )
+  }
+  
+  matches$download_url[[1]]
+}
+
+# Import adult asthma prevalence
+asthma_prevalence_raw <- read_csv(
+  get_csv_url("adults.with.asthma|asthma_prevalence")
+)
+
+# Import adult asthma ED visits
+asthma_ed_raw <- read_csv(
+  get_csv_url("emergency|ed_visits")
+)
+
+# Import adult asthma hospitalizations
+asthma_hospital_raw <- read_csv(
+  get_csv_url("hospitalizations")
+)
+```
+
+```{r}
+glimpse(asthma_prevalence_raw)
+```
+
+```{r}
+glimpse(asthma_ed_raw)
+```
+
+```{r}
+glimpse(asthma_hospital_raw)
+```
+
+```{r}
+names(asthma_prevalence_raw)
+
+names(asthma_ed_raw)
+
+names(asthma_hospital_raw)
+```
+
+```{r}
+dim(asthma_prevalence_raw)
+
+dim(asthma_ed_raw)
+
+dim(asthma_hospital_raw)
+```
+
+## Dataset 1: Asthma Prevalence
+
+Where is adult asthma prevalence highest?
+
+### Cleaning the Dataset
+
+```{r}
+glimpse(asthma_prevalence_raw)
+```
+
+```{r}
+asthma_prevalence_clean <- asthma_prevalence_raw %>%
+  clean_names()
+```
+
+```{r}
+names(asthma_prevalence_clean)
+```
+
+```{r}
+asthma_prevalence_clean %>%
+  count(geo_type_pretty)
+```
+
+The original asthma prevalence dataset contained multiple geographic levels, including citywide, borough, and UHF34 observations. These geographic levels were identified before filtering the data for neighborhood-level analysis.
+
+```{r}
+asthma_prevalence_clean %>%
+  count(time_period)
+```
+
+```{r}
+asthma_prevalence_clean <- asthma_prevalence_clean %>%
+  mutate(
+    number_numeric = parse_number(number)
+  )
+```
+
+```{r}
+asthma_prevalence_clean %>%
+  select(geography, number, number_numeric) %>%
+  head()
+```
+
+### Analysis
+
+Extracting the Asthma percentage
+
+```{r}
+asthma_prevalence_clean <- asthma_prevalence_clean %>%
+  mutate(
+    percent_numeric = parse_number(percent),
+    age_adjusted_percent_numeric =
+      parse_number(age_adjusted_percent)
+  )
+```
+
+```{r}
+asthma_prevalence_clean %>%
+  select(
+    geography,
+    percent,
+    percent_numeric,
+    age_adjusted_percent,
+    age_adjusted_percent_numeric
+  ) %>%
+  head()
+```
+
+Checking for missing values
+
+```{r}
+colSums(is.na(asthma_prevalence_clean))
+```
+
+Checking for dup rows
+
+```{r}
+sum(duplicated(asthma_prevalence_clean))
+```
+
+Neighborhood-level dataset
+
+```{r}
+asthma_prevalence_uhf <- asthma_prevalence_clean %>%
+  filter(geo_type_pretty == "UHF34")
+```
+
+```{r}
+glimpse(asthma_prevalence_uhf)
+```
+
+```{r}
+nrow(asthma_prevalence_uhf)
+```
+
+```{r}
+asthma_prevalence_uhf %>%
+  select(
+    borough,
+    geography,
+    percent_numeric,
+    age_adjusted_percent_numeric
+  ) %>%
+  arrange(desc(age_adjusted_percent_numeric))
+```
+
+This will rank the UHF34 areas from highest to lowest age-adjusted adult asthma prevalence.
+
+```{r}
+asthma_prevalence_uhf %>%
+  select(
+    borough,
+    geography,
+    percent_numeric,
+    age_adjusted_percent_numeric
+  ) %>%
+  arrange(desc(age_adjusted_percent_numeric))
+```
+
+Checking for potential outliers
+
+```{r}
+summary(
+  asthma_prevalence_uhf$age_adjusted_percent_numeric
+)
+```
+
+```{r}
+# Select the 10 UHF areas with the highest
+# age-adjusted asthma prevalence
+asthma_top10 <- asthma_prevalence_uhf %>%
+  arrange(desc(age_adjusted_percent_numeric)) %>%
+  slice_head(n = 10)
+
+# Create the visualization
+ggplot(
+  asthma_top10,
+  aes(
+    x = age_adjusted_percent_numeric,
+    y = reorder(geography, age_adjusted_percent_numeric)
+  )
+) +
+  geom_col() +
+  geom_text(
+    aes(
+      label = paste0(age_adjusted_percent_numeric, "%")
+    ),
+    hjust = -0.15,
+    size = 3.5
+  ) +
+  labs(
+    title = "NYC Areas with the Highest Adult Asthma Prevalence",
+    subtitle = "Top 10 UHF areas based on age-adjusted prevalence",
+    x = "Age-adjusted asthma prevalence (%)",
+    y = "UHF Area",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  expand_limits(
+    x = max(asthma_top10$age_adjusted_percent_numeric) + 3
+  ) +
+  theme_minimal()
+```
+
+### **Findings**
+
+The analysis shows substantial differences in age-adjusted asthma prevalence across NYC UHF areas. East Harlem had the highest prevalence at 26.2%, followed by the Rockaways at 25.8% and Northeast Bronx at 25.0%. Several Bronx and Brooklyn UHF areas also appeared among the ten areas with the highest prevalence. These results identify geographic patterns in asthma prevalence but do not explain the causes of those differences.
+
+## Dataset 2: Asthma Emergency Department Visits
+
+```{r}
+asthma_ed_raw
+```
+
+```{r}
+glimpse(asthma_ed_raw)
+```
+
+```{r}
+dim(asthma_ed_raw)
+```
+
+```{r}
+names(asthma_ed_raw)
+```
+
+```{r}
+asthma_ed_raw %>%
+  count(TimePeriod) %>%
+  arrange(TimePeriod)
+```
+
+```{r}
+asthma_ed_raw %>%
+  count(Geography) %>%
+  arrange(Geography)
+```
+
+```{r}
+n_distinct(asthma_ed_raw$Geography)
+```
+
+```{r}
+range(asthma_ed_raw$TimePeriod, na.rm = TRUE)
+```
+
+The asthma emergency department visits dataset was inspected to understand its structure before cleaning and analysis. The dataset contains 114 observations and 10 variables. The column names, available years, and geographic areas were reviewed to determine how the data are organized. This step also identified the `Value` variable as the asthma ED visit measure and confirmed that the dataset contains multiple years, allowing trends in emergency department visits to be examined over time.
+
+### Cleaning the Dataset
+
+```{r}
+asthma_ed_clean <- asthma_ed_raw %>%
+  clean_names()
+```
+
+```{r}
+glimpse(asthma_ed_clean)
+```
+
+Addressing missing values
+
+```{r}
+colSums(is.na(asthma_ed_clean))
+```
+
+Checking for missing values
+
+```{r}
+asthma_ed_clean %>%
+  filter(is.na(value)) %>%
+  select(time_period, geography, value, note)
+```
+
+Checking for dup rows
+
+```{r}
+sum(duplicated(asthma_ed_clean))
+```
+
+```{r}
+unique(asthma_ed_clean$indicator)
+```
+
+The emergency department dataset reports the age-adjusted rate of adult asthma-related emergency department visits per 10,000 people. Because the dataset contains multiple years, it can be used to examine changes in asthma-related emergency department utilization over time
+
+### Analysis
+
+```{r}
+asthma_ed_clean %>%
+  distinct(geography) %>%
+  arrange(geography)
+```
+
+```{r}
+asthma_ed_clean %>%
+  group_by(geography) %>%
+  summarise(
+    first_year = min(time_period, na.rm = TRUE),
+    last_year = max(time_period, na.rm = TRUE),
+    observations = n()
+  ) %>%
+  arrange(geography)
+```
+
+**Geographic and Time Coverage:** The asthma emergency department dataset contains annual data from 2005 through 2023. It includes the five NYC boroughs—Bronx, Brooklyn, Manhattan, Queens, and Staten Island, as well as New York City overall. Each geographic area contains 19 annual observations, allowing asthma-related emergency department utilization to be compared across boroughs and examined over time.
+
+```{r}
+asthma_ed_clean %>%
+  filter(is.na(value)) %>%
+  select(time_period, geography, value, note)
+```
+
+```{r}
+sum(is.na(asthma_ed_clean$value))
+```
+
+```{r}
+summary(asthma_ed_clean$value)
+```
+
+```{r}
+asthma_ed_clean %>%
+  filter(!is.na(value)) %>%
+  arrange(desc(value)) %>%
+  select(time_period, geography, value) %>%
+  slice_head(n = 10)
+```
+
+Exploratory: The asthma ED visit rates ranged from 26.3 to 225.1 visits per 10,000 people, with six missing observations. The highest observed rates were consistently associated with the Bronx, including the highest rate of 225.1 per 10,000 in 2014. These higher values were retained because they may represent meaningful geographic differences in asthma-related emergency department utilization rather than data errors.
+
+```{r}
+asthma_ed_boroughs <- asthma_ed_clean %>%
+  filter(
+    geography != "New York City",
+    !is.na(value)
+  )
+```
+
+```{r}
+ggplot(
+  asthma_ed_boroughs,
+  aes(
+    x = time_period,
+    y = value,
+    color = geography,
+    group = geography
+  )
+) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Adult Asthma Emergency Department Visit Rates by NYC Borough",
+    subtitle = "Age-adjusted rates from 2005–2023",
+    x = "Year",
+    y = "ED visits per 10,000 people",
+    color = "Borough",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  scale_x_continuous(
+    breaks = seq(2005, 2023, by = 2)
+  ) +
+  theme_minimal()
+```
+
+Filtering ED visits to 2020 for adjusted prevalence match based on dataset 1
+
+```{r}
+asthma_ed_2020 <- asthma_ed_clean %>%
+  filter(
+    time_period == 2020,
+    geography != "New York City",
+    !is.na(value)
+  ) %>%
+  arrange(desc(value))
+
+asthma_ed_2020
+```
+
+```{r}
+ggplot(
+  asthma_ed_2020,
+  aes(
+    x = value,
+    y = reorder(geography, value)
+  )
+) +
+  geom_col() +
+  geom_text(
+    aes(label = round(value, 1)),
+    hjust = -0.15,
+    size = 3.5
+  ) +
+  labs(
+    title = "Adult Asthma Emergency Department Visit Rates by NYC Borough",
+    subtitle = "Age-adjusted rate per 10,000 people, 2020",
+    x = "ED visits per 10,000 people",
+    y = "Borough",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  expand_limits(
+    x = max(asthma_ed_2020$value) + 15
+  ) +
+  theme_minimal()
+```
+
+### Findings
+
+The 2020 analysis shows differences in age-adjusted adult asthma emergency department visit rates across NYC boroughs. The data were examined for missing values and unusually high observations before comparing borough-level rates. Because emergency department utilization was affected by the COVID-19 pandemic in 2020, these results should be interpreted as a snapshot of asthma-related ED use during an atypical healthcare-utilization period rather than as a measure of asthma prevalence.
+
+## Dataset 3: Adult Asthma Hospitalizations
+
+```{r}
+glimpse(asthma_hospital_raw)
+```
+
+```{r}
+dim(asthma_hospital_raw)
+```
+
+```{r}
+names(asthma_hospital_raw)
+```
+
+```{r}
+glimpse(asthma_hospital_raw)
+```
+
+**Preliminary Finding:** The 2020 analysis shows differences in age-adjusted adult asthma emergency department visit rates across NYC boroughs. The data were examined for missing values and unusually high observations before comparing borough-level rates. Because emergency department utilization was affected by the COVID-19 pandemic in 2020, these results should be interpreted as a snapshot of asthma-related ED use during an atypical healthcare-utilization period rather than as a measure of asthma prevalence.
+
+### Cleaning the dataset
+
+```{r}
+asthma_hospital_clean <- asthma_hospital_raw %>%
+  janitor::clean_names() %>%
+  mutate(
+    number_numeric = readr::parse_number(number),
+    annual_rate_numeric =
+      readr::parse_number(estimated_annual_rate_per_10_000),
+    age_adjusted_rate_numeric =
+      readr::parse_number(age_adjusted_rate_per_10_000)
+  )
+```
+
+```{r}
+names(asthma_hospital_clean)
+```
+
+```{r}
+asthma_hospital_clean %>%
+  count(time_period) %>%
+  arrange(time_period)
+```
+
+```{r}
+asthma_hospital_2023 <- asthma_hospital_clean %>%
+  filter(
+    time_period == 2023,
+    geo_type_pretty == "UHF42",
+    !is.na(age_adjusted_rate_numeric)
+  ) %>%
+  arrange(desc(age_adjusted_rate_numeric))
+```
+
+```{r}
+names(asthma_hospital_clean)
+```
+
+```{r}
+names(asthma_hospital_clean)[
+  grepl("age_adjusted", names(asthma_hospital_clean))
+]
+```
+
+```{r}
+asthma_hospital_clean <- asthma_hospital_clean %>%
+  mutate(
+    age_adjusted_rate_numeric =
+      readr::parse_number(age_adjusted_rate_per_10_000)
+  )
+```
+
+```{r}
+asthma_hospital_clean %>%
+  select(
+    time_period,
+    geography,
+    age_adjusted_rate_per_10_000,
+    age_adjusted_rate_numeric
+  ) %>%
+  head()
+```
+
+### Analysis
+
+```{r}
+asthma_hospital_2023 <- asthma_hospital_clean %>%
+  filter(
+    time_period == 2023,
+    geo_type_pretty == "UHF42",
+    !is.na(age_adjusted_rate_numeric)
+  ) %>%
+  arrange(desc(age_adjusted_rate_numeric))
+```
+
+```{r}
+nrow(asthma_hospital_2023)
+```
+
+```{r}
+asthma_hospital_2023 %>%
+  select(
+    borough,
+    geography,
+    age_adjusted_rate_numeric
+  ) %>%
+  slice_head(n = 10)
+```
+
+```{r}
+asthma_hospital_top10 <- asthma_hospital_2023 %>%
+  slice_head(n = 10)
+
+ggplot(
+  asthma_hospital_top10,
+  aes(
+    x = age_adjusted_rate_numeric,
+    y = reorder(geography, age_adjusted_rate_numeric)
+  )
+) +
+  geom_col() +
+  geom_text(
+    aes(label = age_adjusted_rate_numeric),
+    hjust = -0.15,
+    size = 3.5
+  ) +
+  labs(
+    title = "NYC Areas with the Highest Adult Asthma Hospitalization Rates",
+    subtitle = "Top 10 UHF42 areas based on age-adjusted rates, 2023",
+    x = "Hospitalizations per 10,000 people",
+    y = "UHF42 Area",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  expand_limits(
+    x = max(asthma_hospital_top10$age_adjusted_rate_numeric) + 3
+  ) +
+  theme_minimal()
+```
+
+### Findings
+
+Adult asthma hospitalization rates varied across NYC UHF42 areas in 2023. Hunts Point–Mott Haven had the highest age-adjusted hospitalization rate at 22.9 per 10,000, followed by Crotona–Tremont at 19.8 and Pelham–Throgs Neck at 18.8. The six areas with the highest hospitalization rates were all located in the Bronx, indicating a clear geographic concentration of higher asthma-related hospitalization rates.
+
+# Conclusion
+
+Across the three datasets, asthma burden varied across New York City, with several Bronx communities consistently showing higher rates. In 2020, East Harlem had the highest age-adjusted asthma prevalence, while the Bronx had the highest asthma emergency department visit rate. In 2023, the highest hospitalization rates were concentrated in the Bronx, led by Hunts Point–Mott Haven. The recurrence of higher rates in certain communities suggests that asthma burden may be concentrated in specific areas rather than evenly distributed throughout the city. These findings also identify communities that may benefit from further analysis to better understand the factors associated with higher asthma burden. The findings suggest geographic disparities in asthma burden across NYC. However, because the datasets use different years and geographic levels, the results should be viewed as complementary patterns rather than direct comparisons.
+
+# Diabetes
+
+## Introduction and Approach
+
+For my(Marlon Nurse) portion of the group project, I will focus on adult diabetes across New York City. I will use data from the NYC Environment & Health Data Portal to examine diabetes prevalence across UHF34 neighborhood areas.
+
+I will clean and prepare the data in R, examine missing values, duplicate records, and potential outliers, and perform exploratory analysis to determine which communities report the highest diabetes rates. The cleaned diabetes data will later be incorporated into the group's relational database and compared with the asthma and high blood pressure findings.
+
+## Analysis Question
+
+Which NYC UHF34 neighborhoods reported the highest adult diabetes rates in 2022, and are higher rates concentrated in particular boroughs?
+
+## Data Source
+
+The diabetes data were obtained from the NYC Environment & Health Data Portal.
+
+Source: https://a816-dohbesp.nyc.gov/IndicatorPublic/
+
+The dataset contains adult diabetes estimates for 34 UHF neighborhood areas in New York City for 2022.
+
+## Setup
+
+```{r}
+library(tidyverse)
+```
+
+## Load the Data
+
+```{r}
+diabetes_url <- "https://raw.githubusercontent.com/mj-nurse/mnurse-data_607/refs/heads/main/project-03-data-science/NYC%20EH%20Data%20Portal%20-%20Adults%20with%20diabetes%20(filtered).csv"
+
+diabetes_raw <- read_csv(
+  diabetes_url,
+  show_col_types = FALSE
+)
+
+diabetes_raw
+```
+
+## Inspect the Raw Data
+
+```{r}
+dim(diabetes_raw)
+
+names(diabetes_raw)
+
+glimpse(diabetes_raw)
+
+head(diabetes_raw)
+```
+
+The raw dataset was reviewed before cleaning to understand its dimensions, variables, and data types.
+
+## Clean the Dataset
+
+```{r}
+diabetes_clean <- diabetes_raw %>%
+  transmute(
+    year = TimePeriod,
+    geo_id = GeoID,
+    borough = Borough,
+    geography = Geography,
+    diabetes_number = parse_number(Number),
+    diabetes_rate = parse_number(`Rate per 100 residents`)
+  )
+
+diabetes_clean
+```
+
+The original diabetes estimates contained formatting such as commas, confidence intervals, and symbols. `parse_number()` was used to extract the primary numeric estimates so that they could be analyzed in R.
+
+## Inspect the Cleaned Data
+
+```{r}
+glimpse(diabetes_clean)
+
+dim(diabetes_clean)
+
+diabetes_clean %>%
+  count(year)
+
+diabetes_clean %>%
+  count(borough)
+```
+
+The cleaned dataset contains one observation for each UHF34 neighborhood area.
+
+## Check for Missing Values
+
+```{r}
+colSums(is.na(diabetes_clean))
+```
+
+## Check for Duplicate Neighborhoods
+
+```{r}
+sum(duplicated(diabetes_clean$geo_id))
+```
+
+## Examine the Distribution of Diabetes Rates
+
+```{r}
+summary(diabetes_clean$diabetes_rate)
+```
+
+This summary provides the minimum, maximum, median, mean, and quartiles of the neighborhood diabetes rates.
+
+## Check for Potential Outliers
+
+```{r}
+q1 <- quantile(
+  diabetes_clean$diabetes_rate,
+  0.25,
+  na.rm = TRUE
+)
+
+q3 <- quantile(
+  diabetes_clean$diabetes_rate,
+  0.75,
+  na.rm = TRUE
+)
+
+iqr_value <- IQR(
+  diabetes_clean$diabetes_rate,
+  na.rm = TRUE
+)
+
+lower_limit <- q1 - 1.5 * iqr_value
+upper_limit <- q3 + 1.5 * iqr_value
+
+diabetes_outliers <- diabetes_clean %>%
+  filter(
+    diabetes_rate < lower_limit |
+    diabetes_rate > upper_limit
+  )
+
+diabetes_outliers
+```
+
+Potential outliers are reviewed rather than automatically removed because unusually high diabetes rates may represent meaningful geographic health disparities rather than data errors.
+
+# Analysis
+
+## Neighborhood Diabetes Rates
+
+```{r}
+diabetes_ranked <- diabetes_clean %>%
+  arrange(desc(diabetes_rate))
+
+diabetes_ranked %>%
+  select(
+    borough,
+    geography,
+    diabetes_rate,
+    diabetes_number
+  )
+```
+
+This ranks all 34 UHF areas from the highest reported diabetes rate to the lowest.
+
+## Top 10 Areas with the Highest Diabetes Rates
+
+```{r}
+diabetes_top10 <- diabetes_clean %>%
+  arrange(desc(diabetes_rate)) %>%
+  slice_head(n = 10)
+
+diabetes_top10 %>%
+  select(
+    borough,
+    geography,
+    diabetes_rate,
+    diabetes_number
+  )
+```
+
+## Top 10 Diabetes Rate Visualization
+
+```{r}
+ggplot(
+  diabetes_top10,
+  aes(
+    x = diabetes_rate,
+    y = reorder(geography, diabetes_rate)
+  )
+) +
+  geom_col() +
+  geom_text(
+    aes(
+      label = paste0(diabetes_rate, "%")
+    ),
+    hjust = -0.15,
+    size = 3.5
+  ) +
+  labs(
+    title = "NYC Areas with the Highest Adult Diabetes Rates",
+    subtitle = "Top 10 UHF34 areas, 2022",
+    x = "Diabetes rate per 100 residents (%)",
+    y = "UHF34 Area",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  expand_limits(
+    x = max(diabetes_top10$diabetes_rate) + 3
+  ) +
+  theme_minimal()
+```
+
+## Borough Pattern
+
+Because this dataset contains UHF34 neighborhood estimates rather than direct borough-level prevalence estimates, the following summarizes the distribution of neighborhood rates within each borough. These values should not be interpreted as official borough prevalence rates.
+
+```{r}
+diabetes_borough_summary <- diabetes_clean %>%
+  group_by(borough) %>%
+  summarise(
+    neighborhoods = n(),
+    median_diabetes_rate = round(
+      median(diabetes_rate, na.rm = TRUE),
+      1
+    ),
+    minimum_rate = min(
+      diabetes_rate,
+      na.rm = TRUE
+    ),
+    maximum_rate = max(
+      diabetes_rate,
+      na.rm = TRUE
+    )
+  ) %>%
+  arrange(
+    desc(median_diabetes_rate)
+  )
+
+diabetes_borough_summary
+```
+
+## Distribution of Neighborhood Diabetes Rates by Borough
+
+```{r}
+ggplot(
+  diabetes_clean,
+  aes(
+    x = borough,
+    y = diabetes_rate
+  )
+) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of Adult Diabetes Rates by NYC Borough",
+    subtitle = "UHF34 neighborhood estimates, 2022",
+    x = "Borough",
+    y = "Diabetes rate per 100 residents (%)",
+    caption = "Source: NYC Environment & Health Data Portal"
+  ) +
+  theme_minimal()
+```
+
+# Findings
+
+The diabetes analysis shows clear differences in reported adult diabetes rates across NYC UHF34 areas in 2022. Southwest Queens had the highest reported rate at 22.7%, followed by Pelham–Throgs Neck at 18.3% and East Harlem at 17.3%. East New York, East Flatbush–Flatbush, and the South Bronx also appeared among the ten areas with the highest diabetes rates.
+
+When the neighborhood estimates were summarized by borough, the Bronx had the highest median neighborhood diabetes rate at 14.9%. Queens had a median of 9.9%, Brooklyn 9.7%, Staten Island 9.1%, and Manhattan 7.7%. Southwest Queens also appears as a high value compared with the other Queens neighborhoods, but it was retained because it may represent a meaningful geographic difference rather than a data error. Overall, the results suggest that adult diabetes burden varies considerably across NYC neighborhoods and is not evenly distributed throughout the city.
+
+# Prepare Data for the Group Database
+
+```{r}
+diabetes_database <- diabetes_clean %>%
+  transmute(
+    neighborhood_id = as.character(geo_id),
+    condition = "Diabetes",
+    year = year,
+    estimate_value = diabetes_rate,
+    measure_unit = "Percent of adults"
+  )
+
+diabetes_database
+```
+
+## Export Cleaned Diabetes Data
+
+```{r}
+write_csv(
+  diabetes_clean,
+  "diabetes_clean.csv"
+)
+
+write_csv(
+  diabetes_database,
+  "diabetes_database.csv"
+)
+```
+
+# Conclusion
+
+Adult diabetes prevalence varied across NYC UHF34 neighborhoods in 2022. The analysis identified neighborhoods with comparatively high reported diabetes rates and examined whether those higher rates appeared to be concentrated within particular boroughs. These findings can later be compared with the group's asthma and high blood pressure analyses to identify communities that experience higher reported rates across multiple health conditions. Differences in measurement years, geographic definitions, and indicators should be considered before making direct comparisons across the three conditions.
+
+# High Blood Pressure
+
+## Introduction and Approach
+
+For my (Arauca Melendez) portion of the group project, I will focus on high blood pressure among adults across New York City. I will use data from the CDC PLACES program to examine estimated high blood pressure prevalence across geographic areas within NYC.
+
+I will clean and prepare the data in R, check for missing values and duplicate records, and perform exploratory analysis to identify areas with higher estimated rates. I will also compare the distribution of estimates across boroughs. The cleaned data will later be prepared for the group's relational database and compared with the asthma and diabetes findings.
+
+## Analysis Question
+
+Which geographic areas in New York City have the highest estimated prevalence of high blood pressure among adults, and how do the estimates vary across boroughs?
+
+## Data Source
+
+The data come from the CDC PLACES program, which provides local estimates of health conditions and health-related behaviors.
+
+Source: <https://www.cdc.gov/places/tools/data-portal.html>
+
+The data were retrieved through the CDC data API in CSV format. The analysis focuses on the measure **High blood pressure among adults** and geographic areas located within the Bronx, Brooklyn, Manhattan, Queens, and Staten Island.
+
+## Process
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+## Load the Data
+
+The CDC API allows us to request only the records needed for this analysis instead of importing the full national dataset.
+
+```{r}
+# Define the CDC API request
+bp_query <- paste0(
+  "stateabbr='NY' AND ",
+  "measure='High blood pressure among adults' AND ",
+  "countyname in ",
+  "('Bronx','Kings','New York','Queens','Richmond')"
+)
+
+bp_url <- paste0(
+  "https://data.cdc.gov/resource/cwsq-ngmh.csv?$where=",
+  URLencode(bp_query, reserved = TRUE),
+  "&$limit=50000"
+)
+
+# Import the data
+bp_raw <- read_csv(
+  bp_url,
+  show_col_types = FALSE
+)
+
+bp_raw
+```
+
+## Inspecting the Raw Data
+
+```{r}
+dim(bp_raw)
+
+names(bp_raw)
+
+glimpse(bp_raw)
+
+head(bp_raw)
+```
+
+The raw dataset is inspected before cleaning to understand its dimensions, column names, and data types. The `measure` variable identifies the health condition, while `data_value` contains the estimated value for the selected measure.
+
+## Cleaning the Dataset
+
+The original data contain geographic information, the reporting year, the health measure, and the estimated prevalence. The following code keeps the five NYC counties and crude prevalence estimates, then selects the variables needed for analysis.
+
+```{r}
+bp_all <- bp_raw %>%
+  janitor::clean_names()
+
+bp_clean <- bp_all %>%
+  mutate(
+    county_clean = str_remove(
+      str_to_lower(str_trim(countyname)),
+      "\\s+county$"
+    )
+  ) %>%
+  filter(
+    county_clean %in% c(
+      "bronx",
+      "kings",
+      "new york",
+      "queens",
+      "richmond"
+    ),
+    str_detect(
+      data_value_type,
+      regex("crude prevalence", ignore_case = TRUE)
+    )
+  ) %>%
+  transmute(
+    year = as.integer(year),
+    geography_id = locationid,
+    borough = recode(
+      county_clean,
+      "bronx" = "Bronx",
+      "kings" = "Brooklyn",
+      "new york" = "Manhattan",
+      "queens" = "Queens",
+      "richmond" = "Staten Island"
+    ),
+    geography = locationname,
+    blood_pressure_rate = as.numeric(data_value),
+    measure_unit = data_value_unit
+  ) %>%
+  filter(!is.na(blood_pressure_rate))
+
+# Display the cleaned data
+bp_clean
+    
+```
+
+The county names are standardized so that Kings County is identified as Brooklyn, New York County as Manhattan, and Richmond County as Staten Island. The numeric estimates are retained for the analysis.
+
+## Inspecting the Cleaned Data
+
+```{r}
+# Inspect the cleaned data
+glimpse(bp_clean)
+
+# View the first 6 rows
+head(bp_clean)
+
+# Check the number of rows and columns
+dim(bp_clean)
+
+# Check the years included
+sort(unique(bp_clean$year))
+
+# Check how many records are in each borough
+bp_clean %>%
+  count(borough, sort = TRUE)
+```
+
+```{r}
+# Check the boroughs
+unique(bp_clean$borough)
+
+# Summarize the blood pressure rates
+summary(bp_clean$blood_pressure_rate)
+
+# Check for missing values
+colSums(is.na(bp_clean))
+```
+
+## Check for Missing Values
+
+```{r}
+colSums(is.na(bp_raw))
+
+colSums(is.na(bp_clean))
+```
+
+Missing values are checked to identify fields that may be incomplete. Records without a numeric prevalence estimate are excluded from the analysis because they cannot be used in the summaries or visualizations.
+
+## Check for Duplicate Records
+
+```{r}
+sum(duplicated(bp_clean))
+```
+
+This check identifies completely duplicated rows. I also reviewed the geographic identifier and year to determine whether records represent distinct observations.
+
+```{r}
+bp_clean %>%
+  count(geography_id, year) %>%
+  filter(n > 1)
+```
+
+## Examine the Distribution of High Blood Pressure Rates
+
+```{r}
+summary(bp_clean$blood_pressure_rate)
+```
+
+This summary provides the minimum, maximum, median, mean, and quartiles of the estimated high blood pressure prevalence.
+
+## Check for Potential Outliers
+
+```{r}
+q1 <- quantile(
+  bp_clean$blood_pressure_rate,
+  0.25,
+  na.rm = TRUE
+)
+
+q3 <- quantile(
+  bp_clean$blood_pressure_rate,
+  0.75,
+  na.rm = TRUE
+)
+
+iqr_value <- IQR(
+  bp_clean$blood_pressure_rate,
+  na.rm = TRUE
+)
+
+lower_limit <- q1 - 1.5 * iqr_value
+upper_limit <- q3 + 1.5 * iqr_value
+
+bp_outliers <- bp_clean %>%
+  filter(
+    blood_pressure_rate < lower_limit |
+      blood_pressure_rate > upper_limit
+  )
+
+bp_outliers
+```
+
+Potential outliers are reviewed rather than automatically removed. Higher estimates may represent meaningful differences in health conditions across geographic areas rather than data errors.
+
+# Analysis
+
+## Identify the Areas with the Highest High Blood Pressure Rates
+
+The most recent year available in the cleaned data is selected so that areas can be compared using the same reporting year.
+
+```{r}
+latest_bp_year <- max(
+  bp_clean$year,
+  na.rm = TRUE
+)
+
+bp_latest <- bp_clean %>%
+  filter(year == latest_bp_year) %>%
+  arrange(desc(blood_pressure_rate))
+
+bp_latest %>%
+  select(
+    borough,
+    geography,
+    year,
+    blood_pressure_rate
+  )
+```
+
+## Top 10 Areas with the Highest High Blood Pressure Rates
+
+```{r}
+bp_top10 <- bp_latest %>%
+  arrange(desc(blood_pressure_rate)) %>%
+  slice_head(n = 10)
+
+bp_top10 %>%
+  select(
+    borough,
+    geography,
+    blood_pressure_rate
+  )
+```
+
+This table ranks the ten geographic areas with the highest estimated prevalence in the most recent available year.
+
+## Top 10 High Blood Pressure Rate Visualization
+
+```{r}
+# Getting the latest year in the cleaned dataset
+latest_year <- max(bp_clean$year, na.rm = TRUE)
+
+# Finding the top 10 areas with the highest blood pressure rates
+bp_top10 <- bp_clean %>%
+  filter(year == latest_year) %>%
+  arrange(desc(blood_pressure_rate)) %>%
+  slice_head(n = 10)
+
+# Displaying the top 10 areas
+bp_top10
+```
+
+```{r}
+bp_clean %>%
+  select(geography, geography_id, borough, blood_pressure_rate) %>%
+  head(10)
+```
+
+```{r}
+# Get the latest year
+latest_year <- max(bp_clean$year, na.rm = TRUE)
+
+# Find the 10 highest blood pressure rates
+bp_top10 <- bp_clean %>%
+  filter(year == latest_year) %>%
+  arrange(desc(blood_pressure_rate)) %>%
+  slice_head(n = 10) %>%
+  mutate(place = paste(borough, geography, sep = " - "))
+
+# Create the visualization
+ggplot(
+  bp_top10,
+  aes(
+    x = reorder(borough, blood_pressure_rate),
+    y = blood_pressure_rate
+  )
+) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Top 10 Areas with the Highest High Blood Pressure Rates",
+    subtitle = paste("Year:", latest_year),
+    x = "Borough",
+    y = "Adults with High Blood Pressure (%)"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+# Summarize blood pressure rates by borough
+bp_borough_summary <- bp_clean %>%
+  group_by(year, borough) %>%
+  summarise(
+    average_rate = mean(blood_pressure_rate, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Use the latest year available
+latest_year <- max(bp_borough_summary$year, na.rm = TRUE)
+
+bp_borough_latest <- bp_borough_summary %>%
+  filter(year == latest_year) %>%
+  arrange(desc(average_rate))
+
+# Create the borough ranking visualization
+ggplot(
+  bp_borough_latest,
+  aes(
+    x = reorder(borough, average_rate),
+    y = average_rate
+  )
+) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "High Blood Pressure Rates by NYC Borough",
+    subtitle = paste("Boroughs ranked from lowest to highest |", latest_year),
+    x = "Borough",
+    y = "Average High Blood Pressure Rate (%)"
+  ) +
+  theme_minimal()
+```
+
+This bar chart combines the geographic records within each borough and calculates their average rate. The Bronx can ranked first even though Queens has more individual records in the top 10.
+
+## Borough Pattern
+
+Because the CDC data may contain smaller geographic areas rather than direct borough-level prevalence estimates, the following table summarizes the distribution of geographic estimates within each borough. These summaries should not be interpreted as official borough prevalence rates.
+
+```{r}
+bp_borough_summary <- bp_latest %>%
+  group_by(borough) %>%
+  summarise(
+    geographic_areas = n(),
+    median_blood_pressure_rate = round(
+      median(blood_pressure_rate, na.rm = TRUE),
+      1
+    ),
+    minimum_rate = min(
+      blood_pressure_rate,
+      na.rm = TRUE
+    ),
+    maximum_rate = max(
+      blood_pressure_rate,
+      na.rm = TRUE
+    ),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(median_blood_pressure_rate))
+
+bp_borough_summary
+```
+
+## Distribution of High Blood Pressure Rates by Borough
+
+```{r}
+ggplot(
+  bp_latest,
+  aes(
+    x = borough,
+    y = blood_pressure_rate
+  )
+) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of High Blood Pressure Estimates by NYC Borough",
+    subtitle = paste(
+      "Geographic estimates,",
+      latest_bp_year
+    ),
+    x = "Borough",
+    y = "Estimated prevalence (%)",
+    caption = "Source: CDC PLACES"
+  ) +
+  theme_minimal()
+```
+
+The boxplot helps compare the distribution and variation of estimates within each borough. Differences in the medians and ranges can indicate that estimated high blood pressure prevalence varies across geographic areas.
+
+# Findings
+
+The high blood pressure analysis examines differences in estimated adult prevalence across geographic areas in New York City. The top 10 table identifies the areas with the highest estimates in the most recent available year, while the borough summary and boxplot show how estimates are distributed across the five boroughs.
+
+The specific areas and prevalence values should be reported using the results generated by the code. These findings can then be compared with the asthma and diabetes analyses, while considering differences in reporting years, geographic definitions, and measurement methods.
+
+# Prepare Data for the Group Database
+
+The cleaned data are organized into fields that can be used in the group's proposed health estimates table.
+
+```{r}
+blood_pressure_database <- bp_clean %>%
+  transmute(
+    neighborhood_id = as.character(geography_id),
+    condition = "High blood pressure",
+    year = year,
+    estimate_value = blood_pressure_rate,
+    measure_unit = "Percent of adults"
+  )
+
+blood_pressure_database
+```
+
+The CDC geographic identifiers may represent census tracts rather than UHF34 neighborhoods. They should therefore be retained as source identifiers and should not be treated as matching UHF34 identifiers without a verified geographic crosswalk.
+
+## Export Cleaned High Blood Pressure Data
+
+```{r}
+write_csv(
+  bp_clean,
+  "blood_pressure_clean.csv"
+)
+
+write_csv(
+  blood_pressure_database,
+  "blood_pressure_database.csv"
+)
+```
+
+# Conclusion
+
+This analysis uses CDC PLACES data to examine estimated high blood pressure prevalence across New York City. The tables and visualizations help identify differences between geographic areas and summarize how the estimates vary within boroughs. These findings can contribute to the group's overall investigation of asthma, diabetes, and high blood pressure across NYC. However, differences in geographic definitions, reporting years, and measurement methods must be considered before making direct comparisons across the three conditions.
+
+# Integrating the Health Data
+
+The next step I (Arauca Melendez) will do is bring the cleaned asthma, diabetes, and high blood pressure data into a shared structure. This will help our group compare the three health conditions and investigate which communities have higher estimated rates.
+
+Before combining the datasets, we need to make sure that the columns have consistent names and that the geographic identifiers, reporting years, and measurement units are documented. The datasets may use different geographic levels or reporting periods, so we will check these differences before making direct comparisons.
+
+The combined dataset will include the geographic identifier, borough when available, health condition, reporting year, estimated value, and measurement unit. This structure will support comparisons across conditions while preserving the information needed to interpret each estimate correctly.
+
+```{r}
+# Check asthma data
+names(asthma_prevalence_uhf)
+head(asthma_prevalence_uhf, 3)
+
+# Check blood pressure database
+names(blood_pressure_database)
+head(blood_pressure_database, 3)
+
+# Confirm the diabetes database is available
+names(diabetes_database)
+head(diabetes_database, 3)
+```
+
+## Preparing and combining the three datasets
+
+```{r}
+library(tidyverse)
+
+# Prepare asthma data for integration
+asthma_database <- asthma_prevalence_uhf %>%
+  transmute(
+    neighborhood_id = as.character(geo_id),
+    condition = "Asthma",
+    year = as.character(time_period),
+    estimate_value = as.numeric(age_adjusted_percent),
+    measure_unit = "Percent"
+  )
+
+# Check the asthma database
+names(asthma_database)
+head(asthma_database, 3)
+
+# Check the blood pressure database
+names(blood_pressure_database)
+head(blood_pressure_database, 3)
+
+# Check the diabetes database
+names(diabetes_database)
+head(diabetes_database, 3)
+```
+
+```{r}
+# Prepare asthma data
+asthma_ready <- asthma_database %>%
+  transmute(
+    location_id = as.character(neighborhood_id),
+    condition = as.character(condition),
+    year = as.character(year),
+    estimate_value = as.numeric(estimate_value),
+    measure_unit = as.character(measure_unit)
+  )
+
+# Prepare diabetes data
+diabetes_ready <- diabetes_database %>%
+  transmute(
+    location_id = as.character(neighborhood_id),
+    condition = as.character(condition),
+    year = as.character(year),
+    estimate_value = as.numeric(estimate_value),
+    measure_unit = as.character(measure_unit)
+  )
+
+# Prepare blood pressure data
+bp_ready <- blood_pressure_database %>%
+  transmute(
+    location_id = as.character(neighborhood_id),
+    condition = as.character(condition),
+    year = as.character(year),
+    estimate_value = as.numeric(estimate_value),
+    measure_unit = as.character(measure_unit)
+  )
+
+# Combine all three datasets
+health_estimates_raw <- bind_rows(
+  asthma_ready,
+  diabetes_ready,
+  bp_ready
+)
+
+# Check the combined data
+head(health_estimates_raw)
+```
+
+## Creating the health conditions table
+
+```{r}
+# Prepare asthma data
+asthma_ready <- asthma_database %>%
+  transmute(
+    location_id = as.character(neighborhood_id),
+    condition = as.character(condition),
+    year = as.character(year),
+    estimate_value = as.numeric(estimate_value),
+    measure_unit = as.character(measure_unit)
+  )
+
+# Prepare diabetes data
+diabetes_ready <- diabetes_database %>%
+  transmute(
+    location_id = as.character(neighborhood_id),
+    condition = as.character(condition),
+    year = as.character(year),
+    estimate_value = as.numeric(estimate_value),
+    measure_unit = as.character(measure_unit)
+  )
+
+# Prepare blood pressure data
+bp_ready <- blood_pressure_database %>%
+  transmute(
+    location_id = as.character(neighborhood_id),
+    condition = as.character(condition),
+    year = as.character(year),
+    estimate_value = as.numeric(estimate_value),
+    measure_unit = as.character(measure_unit)
+  )
+
+# Combine all three datasets
+health_estimates_raw <- bind_rows(
+  asthma_ready,
+  diabetes_ready,
+  bp_ready
+)
+
+# Check the combined data
+head(health_estimates_raw)
+```
+
+## Creating the locations table
+
+```{r}
+locations <- health_estimates_raw %>%
+  distinct(location_id) %>%
+  arrange(location_id)
+
+head(locations)
+```
+
+## Creating the health estimates table
+
+```{r}
+# Create a table of health conditions
+health_conditions <- tibble(
+  condition_id = 1:3,
+  condition = c(
+    "Asthma",
+    "Diabetes",
+    "High blood pressure"
+  )
+)
+```
+
+```{r}
+health_estimates <- health_estimates_raw %>%
+  left_join(
+    health_conditions,
+    by = "condition"
+  ) %>%
+  mutate(
+    estimate_id = row_number()
+  ) %>%
+  select(
+    estimate_id,
+    location_id,
+    condition_id,
+    year,
+    estimate_value,
+    measure_unit
+  )
+
+head(health_estimates)
+```
+
+## Checking that the integration table worked
+
+```{r}
+# Count records for each health condition
+health_estimates_raw %>%
+  count(condition)
+
+# Check the final table structure
+names(health_estimates)
+
+# Count total records
+nrow(health_estimates)
+
+# Check for missing values
+colSums(is.na(health_estimates))
+
+# Check that every condition received an ID
+sum(is.na(health_estimates$condition_id))
+```
+
+**final check**
+
+```{r}
+health_estimates %>%
+  count(condition_id)
+```
+
+```{r}
+health_conditions
+```
+
+## Checking the lcoations table
+
+```{r}
+# Check the locations table
+head(locations)
+
+# Count the number of locations
+nrow(locations)
+
+# Check the column names
+names(locations)
+
+# Check for missing values
+colSums(is.na(locations))
+```
+
+## Checking location IDs
+
+```{r}
+# Check whether location IDs are unique
+locations %>%
+  summarise(
+    total_locations = n(),
+    unique_locations = n_distinct(location_id),
+    duplicate_locations = total_locations - unique_locations
+  )
+```
+
+```{r}
+# See which conditions use the most location IDs
+health_estimates %>%
+  count(condition_id, name = "number_of_estimates")
+```
+
+## Checking whether location IDs overlap
+
+```{r}
+asthma_locations <- asthma_database %>%
+  distinct(neighborhood_id)
+
+diabetes_locations <- diabetes_database %>%
+  distinct(neighborhood_id)
+
+inner_join(
+  asthma_locations,
+  diabetes_locations,
+  by = "neighborhood_id"
+) %>%
+  summarise(shared_locations = n())
+```
+
+## Checking the geographic levels
+
+```{r}
+asthma_prevalence_uhf %>%
+  count(geo_type_pretty, geography)
+```
+
+```{r}
+diabetes_database %>%
+  summarise(
+    total_locations = n_distinct(neighborhood_id),
+    years = paste(sort(unique(year)), collapse = ", ")
+  )
+```
+
+## Checking the asthma reporting year
+
+```{r}
+asthma_database %>%
+  count(year)
+```
+
+## Checking the diabetes location IDs
+
+```{r}
+head(diabetes_database, 10)
+```
+
+```{r}
+# Check the unusual ID in both datasets
+asthma_database %>%
+  filter(neighborhood_id == "105106107")
+
+diabetes_database %>%
+  filter(neighborhood_id == "105106107")
+```
+
+## Checking the original asthma data
+
+```{r}
+asthma_prevalence_uhf %>%
+  filter(geo_id %in% c(105, 106, 107)) %>%
+  select(geo_id, geography, percent_numeric)
+```
+
+```{r}
+asthma_prevalence_uhf %>%
+  select(geo_id, geography, geo_type_pretty) %>%
+  head(15)
+```
+
+```{r}
+diabetes_database %>%
+  filter(neighborhood_id == "105106107")
+```
+
+# Comparing
+
+```{r}
+library(tidyverse)
+
+# Prepare asthma and diabetes estimates for comparison
+comparison_data <- bind_rows(
+  asthma_database %>%
+    mutate(year = as.character(year)),
+  diabetes_database %>%
+    mutate(year = as.character(year))
+) %>%
+  mutate(
+    neighborhood_id = as.character(neighborhood_id),
+    condition_year = case_when(
+      condition == "Asthma" ~ "Asthma (2020)",
+      condition == "Diabetes" ~ "Diabetes (2022)"
+    )
+  )
+
+# Check the prepared data
+head(comparison_data)
+```
+
+```{r}
+ggplot(comparison_data, 
+       aes(x = neighborhood_id,
+           y = estimate_value,
+           fill = condition_year)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Asthma and Diabetes Rates Across NYC Neighborhoods",
+    subtitle = "Asthma: 2020 | Diabetes: 2022",
+    x = "Neighborhood ID",
+    y = "Estimated Rate (%)",
+    fill = "Condition and Year"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1
+    )
+  )
+```
+
+###Updating my chart
+
+```{r}
+# Create a lookup table of neighborhood IDs and names
+neighborhood_names <- asthma_prevalence_uhf %>%
+  distinct(geo_id, geography) %>%
+  mutate(neighborhood_id = as.character(geo_id)) %>%
+  select(neighborhood_id, geography)
+
+# Add neighborhood names to the comparison data
+comparison_data <- comparison_data %>%
+  left_join(neighborhood_names, by = "neighborhood_id")
+
+# Check the results
+comparison_data %>%
+  select(neighborhood_id, geography, condition, estimate_value) %>%
+  head(10)
+```
+
+```{r}
+ggplot(
+  comparison_data,
+  aes(
+    x = reorder(geography, estimate_value),
+    y = estimate_value,
+    fill = condition_year
+  )
+) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Asthma and Diabetes Rates Across NYC Neighborhoods",
+    subtitle = "Asthma: 2020 | Diabetes: 2022",
+    x = "Neighborhood",
+    y = "Estimated Rate (%)",
+    fill = "Condition and Year"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+comparison_data %>%
+  filter(condition == "Diabetes") %>%
+  select(neighborhood_id, geography, condition, estimate_value) %>%
+  head(10)
+```
+
+```{r}
+ggplot(
+  comparison_data,
+  aes(
+    x = reorder(geography, estimate_value, FUN = max),
+    y = estimate_value,
+    fill = condition_year
+  )
+) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Asthma and Diabetes Rates Across NYC Neighborhoods",
+    subtitle = "Asthma: 2020 | Diabetes: 2022",
+    x = "Neighborhood",
+    y = "Estimated Rate (%)",
+    fill = "Condition and Year"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 7),
+    plot.title = element_text(size = 14),
+    plot.subtitle = element_text(size = 10),
+    legend.position = "bottom"
+  )
+```
+
+## Checking the blood pressure data
+
+```{r}
+# See the columns in the blood pressure data
+names(blood_pressure_database)
+```
+
+```{r}
+# Look at the first 6 rows
+head(blood_pressure_database)
+```
+
+## Finding the original blood presure dataset
+
+```{r}
+# List the data objects currently loaded in R
+ls()
+```
+
+## Checking the geographic columns
+
+```{r}
+# Check the columns in the original blood pressure data
+names(bp_raw)
+```
+
+```{r}
+# Preview the original data
+head(bp_raw)
+```
+
+## CHecking the coordinates
+
+```{r}
+bp_raw %>%
+  select(locationname, locationid, data_value, geolocation) %>%
+  head(10)
+```
+
+```{r}
+# Check whether coordinates are missing
+sum(is.na(bp_raw$geolocation))
+```
+
+## Creating the high blood pressure point map
+
+```{r}
+
+library(tidyverse)
+
+# Keep the 2023 high blood pressure data
+bp_map_data <- bp_raw %>%
+  filter(
+    year == 2023,
+    measure == "High blood pressure among adults",
+    !is.na(data_value),
+    !is.na(geolocation)
+  ) %>%
+  mutate(
+    # Extract longitude and latitude from POINT coordinates
+    longitude = as.numeric(
+      stringr::str_match(geolocation, "POINT \\((-?[0-9.]+)")[, 2]
+    ),
+    latitude = as.numeric(
+      stringr::str_match(geolocation, "POINT \\(-?[0-9.]+ (-?[0-9.]+)")[, 2]
+    )
+  ) %>%
+  filter(!is.na(longitude), !is.na(latitude))
+
+# Plot the map
+ggplot(bp_map_data, aes(x = longitude, y = latitude)) +
+  geom_point(aes(color = data_value), size = 2, alpha = 0.8) +
+  coord_fixed() +
+  scale_color_viridis_c(name = "Adults (%)") +
+  labs(
+    title = "High Blood Pressure Across NYC Census Tracts",
+    subtitle = "CDC PLACES estimates, 2023",
+    x = "Longitude",
+    y = "Latitude",
+    caption = "Each point represents a census tract location."
+  ) +
+  theme_minimal()
+
+```
+
+## Creating a map
+
+```{r}
+library(tidyverse)
+library(sf)
+library(tigris)
+library(viridis)
+```
+
+```{r}
+options(tigris_use_cache = TRUE)
+
+nyc_tracts <- tigris::tracts(
+  state = "NY",
+  county = c("005", "047", "061", "081", "085"),
+  year = 2023,
+  cb = TRUE
+)
+
+head(nyc_tracts)
+names(nyc_tracts)
+```
+
+### Matching my blood pressure map to an nyc map
+
+```{r}
+bp_choropleth_data <- bp_raw %>%
+  filter(
+    year == 2023,
+    measure == "High blood pressure among adults",
+    !is.na(data_value)
+  ) %>%
+  mutate(
+    GEOID = as.character(locationid),
+    data_value = as.numeric(data_value)
+  ) %>%
+  select(GEOID, data_value) %>%
+  distinct(GEOID, .keep_all = TRUE)
+
+nyc_bp_map <- nyc_tracts %>%
+  left_join(bp_choropleth_data, by = "GEOID")
+```
+
+## creating my shaded nyc map
+
+```{r}
+ggplot(nyc_bp_map) +
+  geom_sf(
+    aes(fill = data_value),
+    color = "white",
+    linewidth = 0.05
+  ) +
+  scale_fill_viridis_c(
+    name = "Adults (%)",
+    option = "C",
+    na.value = "grey90"
+  ) +
+  labs(
+    title = "High Blood Pressure Across NYC Census Tracts",
+    subtitle = "CDC PLACES estimates, 2023",
+    caption = paste(
+      "Each shaded area represents a census tract.",
+      "Darker colors indicate higher estimated prevalence."
+    )
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 11),
+    legend.position = "right"
+  )
+```
+
+The gray areas on the map represent census tracts where a high blood pressure estimate was not available or could not be matched to the geographic data. These areas are shown in gray because the map does not have a usable estimate to display for them. Gray does not mean that high blood pressure is absent in those communities; it means that the data could not be displayed for those locations.
+
+## Creating a bubble map
+
+```{r}
+# Loading the data
+library(tidyverse)
+library(sf)
+library(ggplot2)
+library(ggrepel)
+```
+
+```{r}
+# Checking existing data
+names(asthma_database)
+names(diabetes_database)
+names(bp_raw)
+```
+
+### Neighborhood lookup table
+
+```{r}
+head(neighborhood_names)
+head(asthma_prevalence_uhf)
+head(diabetes_locations)
+```
+
+### Checking the blood pressure locations
+
+```{r}
+head(
+  bp_raw %>%
+    filter(
+      year == 2023,
+      measure == "High blood pressure among adults"
+    ) %>%
+    select(countyname, locationname, locationid, data_value)
+)
+```
+
+```{r}
+head(neighborhood_names)
+head(asthma_prevalence_uhf)
+head(diabetes_locations)
+```
+
+```{r}
+head(bp_borough_summary)
+names(bp_borough_summary)
+```
+
+```{r}
+head(asthma_database)
+head(diabetes_database)
+```
+
+```{r}
+# Prepare asthma data
+asthma_plot <- asthma_database %>%
+  transmute(
+    location = as.character(neighborhood_id),
+    condition = "Asthma",
+    rate = estimate_value,
+    geography = "UHF neighborhood",
+    year = as.character(year)
+  )
+
+# Prepare diabetes data
+diabetes_plot <- diabetes_database %>%
+  transmute(
+    location = as.character(neighborhood_id),
+    condition = "Diabetes",
+    rate = estimate_value,
+    geography = "UHF neighborhood",
+    year = as.character(year)
+  )
+
+# Prepare high blood pressure data
+bp_plot <- bp_borough_summary %>%
+  transmute(
+    location = borough,
+    condition = "High blood pressure",
+    rate = median_blood_pressure_rate,
+    geography = "Borough",
+    year = "2023"
+  )
+
+# Combine all three conditions
+health_bubbles <- bind_rows(
+  asthma_plot,
+  diabetes_plot,
+  bp_plot
+) %>%
+  mutate(
+    condition = factor(
+      condition,
+      levels = c(
+        "Asthma",
+        "Diabetes",
+        "High blood pressure"
+      )
+    )
+  )
+```
+
+```{r}
+ggplot(
+  health_bubbles,
+  aes(
+    x = location,
+    y = rate,
+    size = rate,
+    color = condition
+  )
+) +
+  geom_point(alpha = 0.7) +
+  scale_color_manual(
+    values = c(
+      "Asthma" = "steelblue",
+      "Diabetes" = "darkorange",
+      "High blood pressure" = "darkgreen"
+    )
+  ) +
+  scale_size_continuous(range = c(2, 9)) +
+  labs(
+    title = "Asthma, Diabetes, and High Blood Pressure Across NYC",
+    subtitle = "Asthma (2020), Diabetes (2022), High blood pressure (2023)",
+    x = "Neighborhood or Borough",
+    y = "Estimated rate (%)",
+    color = "Health condition",
+    size = "Estimated rate (%)",
+    caption = "Asthma and diabetes are UHF neighborhood estimates; blood pressure values are borough medians."
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      size = 8
+    ),
+    legend.position = "bottom"
+  )
+```
+
+```{r}
+# Create a lookup table with neighborhood names
+neighborhood_lookup <- asthma_prevalence_uhf %>%
+  distinct(geo_id, geography) %>%
+  mutate(neighborhood_id = as.character(geo_id)) %>%
+  select(neighborhood_id, geography)
+
+# Prepare asthma data with neighborhood names
+asthma_plot <- asthma_database %>%
+  left_join(neighborhood_lookup, by = "neighborhood_id") %>%
+  transmute(
+    location = geography,
+    condition = "Asthma",
+    rate = estimate_value,
+    year = as.character(year)
+  )
+
+# Prepare diabetes data with neighborhood names
+diabetes_plot <- diabetes_database %>%
+  left_join(neighborhood_lookup, by = "neighborhood_id") %>%
+  transmute(
+    location = geography,
+    condition = "Diabetes",
+    rate = estimate_value,
+    year = as.character(year)
+  )
+
+# Prepare high blood pressure data with borough names
+bp_plot <- bp_borough_summary %>%
+  transmute(
+    location = borough,
+    condition = "High blood pressure",
+    rate = median_blood_pressure_rate,
+    year = "2023"
+  )
+
+# Combine all three datasets
+health_bubbles <- bind_rows(
+  asthma_plot,
+  diabetes_plot,
+  bp_plot
+) %>%
+  filter(!is.na(location), !is.na(rate)) %>%
+  mutate(
+    condition = factor(
+      condition,
+      levels = c(
+        "Asthma",
+        "Diabetes",
+        "High blood pressure"
+      )
+    )
+  )
+```
+
+```{r}
+asthma_plot <- asthma_database %>%
+  mutate(neighborhood_id = as.character(neighborhood_id)) %>%
+  left_join(neighborhood_lookup, by = "neighborhood_id") %>%
+  transmute(
+    location = geography,
+    condition = "Asthma",
+    rate = estimate_value,
+    year = as.character(year)
+  )
+
+diabetes_plot <- diabetes_database %>%
+  mutate(neighborhood_id = as.character(neighborhood_id)) %>%
+  left_join(neighborhood_lookup, by = "neighborhood_id") %>%
+  transmute(
+    location = geography,
+    condition = "Diabetes",
+    rate = estimate_value,
+    year = as.character(year)
+  )
+```
+
+```{r}
+ggplot(
+  health_bubbles,
+  aes(
+    x = location,
+    y = rate,
+    size = rate,
+    color = condition
+  )
+) +
+  geom_point(alpha = 0.7) +
+  scale_color_manual(
+    values = c(
+      "Asthma" = "steelblue",
+      "Diabetes" = "darkorange",
+      "High blood pressure" = "darkgreen"
+    )
+  ) +
+  scale_size_continuous(range = c(2, 9)) +
+  labs(
+    title = "Asthma, Diabetes, and High Blood Pressure Across NYC",
+    subtitle = "Asthma (2020), Diabetes (2022), High blood pressure (2023)",
+    x = "Neighborhood or Borough",
+    y = "Estimated rate (%)",
+    color = "Health condition",
+    size = "Estimated rate (%)",
+    caption = "Asthma and diabetes are UHF neighborhood estimates; blood pressure values are borough medians."
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      size = 8
+    ),
+    legend.position = "bottom"
+  )
+```
+
+```{r}
+
+library(ggplot2)
+library(forcats)
+
+ggplot(
+  health_bubbles,
+  aes(
+    x = rate,
+    y = fct_reorder(location, rate, .fun = median),
+    color = condition
+  )
+) +
+  geom_point(
+    size = 2.5,
+    alpha = 0.85,
+    position = position_dodge(width = 0.5)
+  ) +
+  scale_color_manual(
+    values = c(
+      "Asthma" = "steelblue",
+      "Diabetes" = "darkorange",
+      "High blood pressure" = "darkgreen"
+    )
+  ) +
+  labs(
+    title = "Asthma, Diabetes, and High Blood Pressure Across NYC",
+    subtitle = "Asthma (2020) | Diabetes (2022) | High blood pressure (2023)",
+    x = "Estimated rate (%)",
+    y = NULL,
+    color = "Health condition",
+    caption = paste(
+      "Asthma and diabetes are UHF neighborhood estimates;",
+      "blood pressure values are borough medians."
+    )
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.text.y = element_text(size = 8),
+    axis.text.x = element_text(size = 9),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    plot.title = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    plot.caption = element_text(size = 8)
+  )
+
+```
+
+```{r}
+
+ggplot(
+  health_bubbles,
+  aes(
+    x = rate,
+    y = forcats::fct_reorder(location, rate),
+    color = condition
+  )
+) +
+  geom_point(size = 2.5) +
+  facet_wrap(
+    ~ condition,
+    scales = "free_y",
+    ncol = 1
+  ) +
+  scale_color_manual(
+    values = c(
+      "Asthma" = "steelblue",
+      "Diabetes" = "darkorange",
+      "High blood pressure" = "darkgreen"
+    )
+  ) +
+  labs(
+    title = "Health Conditions Across NYC",
+    subtitle = "Rates by neighborhood or borough",
+    x = "Estimated rate (%)",
+    y = NULL,
+    caption = paste(
+      "Asthma and diabetes: UHF neighborhood estimates.",
+      "Blood pressure: borough medians."
+    )
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(
+    legend.position = "none",
+    axis.text.y = element_text(size = 7),
+    strip.text = element_text(face = "bold"),
+    panel.grid.major.y = element_blank()
+  )
+
+```
+
+```{r}
+library(dplyr)
+
+borough_health <- bind_rows(
+  asthma_database %>%
+    inner_join(
+      asthma_prevalence_uhf %>%
+        transmute(
+          neighborhood_id = as.character(geo_id),
+          borough
+        ) %>%
+        distinct(),
+      by = "neighborhood_id"
+    ) %>%
+    group_by(borough) %>%
+    summarise(
+      rate = mean(estimate_value, na.rm = TRUE),
+      condition = "Asthma",
+      year = "2020",
+      .groups = "drop"
+    ),
+
+  diabetes_database %>%
+    inner_join(
+      asthma_prevalence_uhf %>%
+        transmute(
+          neighborhood_id = as.character(geo_id),
+          borough
+        ) %>%
+        distinct(),
+      by = "neighborhood_id"
+    ) %>%
+    group_by(borough) %>%
+    summarise(
+      rate = mean(estimate_value, na.rm = TRUE),
+      condition = "Diabetes",
+      year = "2022",
+      .groups = "drop"
+    ),
+
+  bp_borough_summary
+)
+```
+
+```{r}
+library(ggplot2)
+library(forcats)
+library(dplyr)
+
+# Set borough and condition order
+borough_health <- borough_health %>%
+  mutate(
+    borough = factor(
+      as.character(borough),
+      levels = c(
+        "Bronx",
+        "Brooklyn",
+        "Manhattan",
+        "Queens",
+        "Staten Island"
+      )
+    ),
+    condition = factor(
+      as.character(condition),
+      levels = c(
+        "Asthma",
+        "Diabetes",
+        "High blood pressure"
+      )
+    )
+  )
+
+# Create the plot
+ggplot(
+  borough_health,
+  aes(
+    x = rate,
+    y = fct_rev(borough),
+    color = condition
+  )
+) +
+  geom_point(size = 3.5) +
+  facet_wrap(~ condition, ncol = 1, scales = "fixed") +
+  scale_color_manual(
+    values = c(
+      "Asthma" = "steelblue",
+      "Diabetes" = "darkorange",
+      "High blood pressure" = "darkgreen"
+    )
+  ) +
+  labs(
+    title = "Asthma, Diabetes, and High Blood Pressure Across NYC",
+    subtitle = "Borough-level estimated rates",
+    x = "Estimated rate (%)",
+    y = NULL,
+    caption = paste(
+      "Sources and reference years vary by condition.",
+      "See source notes for definitions and methodology."
+    )
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(face = "bold"),
+    axis.text.y = element_text(size = 9),
+    panel.grid.major.y = element_blank(),
+    panel.spacing.y = grid::unit(1, "lines"),
+    plot.title = element_text(face = "bold")
+  )
+```
+
+## Borough Level Data
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+
+# Get the borough for each UHF neighborhood
+neighborhood_borough <- asthma_prevalence_uhf %>%
+  distinct(geo_id, borough) %>%
+  mutate(
+    neighborhood_id = as.character(geo_id)
+  ) %>%
+  select(neighborhood_id, borough)
+
+# Summarize asthma by borough
+asthma_borough <- asthma_database %>%
+  mutate(neighborhood_id = as.character(neighborhood_id)) %>%
+  left_join(neighborhood_borough, by = "neighborhood_id") %>%
+  filter(!is.na(borough)) %>%
+  group_by(borough) %>%
+  summarise(
+    rate = mean(estimate_value, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    condition = "Asthma",
+    year = "2020"
+  )
+
+# Summarize diabetes by borough
+diabetes_borough <- diabetes_database %>%
+  mutate(neighborhood_id = as.character(neighborhood_id)) %>%
+  left_join(neighborhood_borough, by = "neighborhood_id") %>%
+  filter(!is.na(borough)) %>%
+  group_by(borough) %>%
+  summarise(
+    rate = mean(estimate_value, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    condition = "Diabetes",
+    year = "2022"
+  )
+
+# Use existing borough-level blood pressure summaries
+bp_borough <- bp_borough_summary %>%
+  transmute(
+    borough = borough,
+    rate = median_blood_pressure_rate,
+    condition = "High blood pressure",
+    year = "2023"
+  )
+
+# Combine all three conditions
+borough_health <- bind_rows(
+  asthma_borough,
+  diabetes_borough,
+  bp_borough
+) %>%
+  mutate(
+    condition = factor(
+      condition,
+      levels = c("Asthma", "Diabetes", "High blood pressure")
+    ),
+    borough = factor(
+      borough,
+      levels = c(
+        "Bronx", "Brooklyn", "Manhattan",
+        "Queens", "Staten Island"
+      )
+    )
+  )
+```
+
+```{r}
+
+library(ggplot2)
+library(dplyr)
+library(forcats)
+
+borough_health <- borough_health %>%
+  mutate(
+    borough = factor(
+      borough,
+      levels = c(
+        "Bronx", "Brooklyn", "Manhattan",
+        "Queens", "Staten Island"
+      )
+    )
+  )
+
+ggplot(
+  borough_health,
+  aes(
+    x = rate,
+    y = borough,
+    color = condition
+  )
+) +
+  geom_segment(
+    aes(
+      x = 0,
+      xend = rate,
+      yend = borough
+    ),
+    color = "grey85",
+    linewidth = 0.6
+  ) +
+  geom_point(size = 3.5) +
+  geom_text(
+    aes(label = sprintf("%.1f", rate)),
+    hjust = -0.4,
+    size = 3.2,
+    show.legend = FALSE
+  ) +
+  facet_wrap(
+    ~ condition,
+    ncol = 1,
+    scales = "fixed"
+  ) +
+  scale_color_manual(
+    values = c(
+      "Asthma" = "steelblue",
+      "Diabetes" = "darkorange",
+      "High blood pressure" = "darkgreen"
+    )
+  ) +
+  scale_x_continuous(
+    limits = c(0, NA),
+    expand = expansion(mult = c(0, 0.15))
+  ) +
+  labs(
+    title = "Asthma, Diabetes, and High Blood Pressure Across NYC",
+    subtitle = paste(
+      "Asthma (2020), diabetes (2022),",
+      "and high blood pressure (2023)"
+    ),
+    x = "Estimated rate (%)",
+    y = NULL,
+    caption = paste(
+      "Asthma and diabetes: UHF neighborhood estimates aggregated",
+      "to borough level where appropriate.",
+      "High blood pressure: borough median estimates."
+    )
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(
+      face = "bold",
+      size = 12
+    ),
+    axis.text.y = element_text(size = 9),
+    panel.grid.major.y = element_blank(),
+    panel.spacing.y = grid::unit(1.2, "lines"),
+    plot.title = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 10),
+    plot.caption = element_text(size = 8),
+    plot.caption.position = "plot",
+    plot.margin = margin(12, 24, 12, 12)
+  )
+
+```
+
+```{r}
+ggsave(
+  "borough_health.png",
+  width = 10,
+  height = 9,
+  units = "in",
+  dpi = 300
+)
+```
+
+## Findings
+
+The analysis examined asthma, diabetes, and high blood pressure estimates across New York City boroughs using data from 2020, 2022, and 2023.
+
+The results show that the **Bronx had the highest estimated rate for all three health conditions**. Asthma had an estimated rate of 19.8% in the Bronx, compared with 12.2% in Brooklyn. This was a difference of 7.6 percentage points. For diabetes, the Bronx had the highest estimate at 14.4%, while Manhattan had the lowest at 9.0%, a difference of 5.4 percentage points. High blood pressure followed a similar pattern, with the Bronx at 34.7% and Manhattan at 25.3%, a difference of 9.4 percentage points.
+
+Manhattan had the lowest estimated rates for both diabetes and high blood pressure, while Brooklyn had the lowest asthma estimate. These results show that the estimated rates of the three health conditions vary across boroughs, with the Bronx consistently having the highest estimates in this analysis.
+
+The high blood pressure estimates were higher than the asthma and diabetes estimates across all five boroughs. However, the datasets cover different years and use different methods to summarize neighborhood and census-tract estimates. Therefore, the percentages should not be treated as a direct comparison of the overall prevalence of the three conditions.
+
+## Conclusion
+
+The purpose of this project was to examine how asthma, diabetes, and high blood pressure estimates vary across New York City boroughs and identify communities with higher estimated health burdens. Based on the results, the Bronx stands out because it had the highest estimated rate for all three conditions. This pattern suggests that the borough may be an important area for further investigation into health disparities and access to health resources.
+
+The analysis also shows that health patterns differ by condition and location. Although Manhattan had the lowest estimates for diabetes and high blood pressure, Brooklyn had the lowest asthma estimate. Looking at multiple health conditions provides a broader view of how health burdens may vary across communities.
+
+There are limitations to this analysis. The datasets cover different years and geographic units, and the borough summaries use different methods. The results describe estimated rates and do not explain why the differences exist or establish that any particular factor caused them. Future analysis could use data from the same year and geographic level and examine additional factors, such as income, access to healthcare, and other neighborhood characteristics, to better understand these patterns.
+
+Overall, this project demonstrates how data analysis and visualization can help identify geographic differences in health estimates across New York City. The consistent pattern of higher estimates in the Bronx highlights an area for further research and public health attention. Although the data do not explain the reasons behind these differences, they show how data can help identify potential health disparities, better understand community needs, and support more informed public health decisions. Recognizing these patterns is an important first step toward further investigation and developing approaches to address health disparities across NYC communities.
