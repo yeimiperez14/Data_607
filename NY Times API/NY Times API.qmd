@@ -1,0 +1,448 @@
+---
+title: "NY Times API | Beverage Coverage Analysis"
+author: "Yeimi Perez"
+format: html
+editor: visual
+---
+
+# Approach
+
+For this assignment, I will use the New York Times Article Search API to investigate how media coverage of coffee, matcha, and energy drinks changed between 2020 and 2025. My research question is: How did New York Times coverage of these three beverages change over time, and which experienced the greatest increase in media attention?
+
+I selected this topic because coffee has remained a popular beverage for years, while matcha and energy drinks have gained increasing attention in consumer culture. I am interested in exploring whether these changing trends are reflected in New York Times reporting. I will make API requests using beverage-related keywords and publication date filters.
+
+I will use `jsonlite`, `dplyr`, and `tidyr` to parse the JSON responses and organize the results into a tidy data frame. My analysis will focus on the number of articles matching each beverage keyword by publication year, using summary statistics and visualizations to identify patterns and changes over time.
+
+```{r}
+  "httr2",
+  "jsonlite",
+  "dplyr",
+  "tidyr",
+  "purrr",
+  "ggplot2",
+  "tibble",
+  "usethis"
+))
+```
+
+```{r}
+api_key <- Sys.getenv("NYT_API_KEY")
+
+nzchar(api_key)
+```
+
+# Introduction
+
+This analysis uses the New York Times Article Search API to examine how media coverage of coffee, matcha, and energy drinks changed from 2020 through 2025.
+
+Research question: Which beverage received the most keyword-search matches, and which experienced the greatest increase in coverage over time?
+
+## Selected API
+
+API: New York Times Article Search API, Version 2
+
+Endpoint: <https://api.nytimes.com/svc/search/v2/articlesearch.json>
+
+Description: This API allows users to search New York Times articles using keywords and publication date filters.
+
+```{r}
+api_key <- Sys.getenv("NYT_API_KEY")
+
+if (!nzchar(api_key)) {
+  stop("NYT_API_KEY is missing.")
+}
+```
+
+The chunk runs without error and does not display my key.
+
+```{r}
+# Retrieve securely stored API key
+api_key <- Sys.getenv("NYT_API_KEY")
+
+# Define the API endpoint
+endpoint <- "https://api.nytimes.com/svc/search/v2/articlesearch.json"
+
+# Make the request
+response <- httr2::request(endpoint) |>
+  httr2::req_url_query(
+    q = "coffee",
+    begin_date = "20200101",
+    end_date = "20201231",
+    page = 0,
+    `api-key` = api_key
+  ) |>
+  httr2::req_timeout(30) |>
+  httr2::req_perform()
+
+# Check the response status
+httr2::resp_status(response)
+```
+
+## Parsing the JSON Response
+
+```{r}
+# Extract the API response as JSON text
+json_text <- httr2::resp_body_string(response)
+
+# Convert JSON into an R list
+nyt_data <- jsonlite::fromJSON(
+  json_text,
+  simplifyVector = FALSE
+)
+
+# Examine the main response components
+names(nyt_data$response)
+```
+
+|  |  |
+|----|----|
+| `resp_body_string()` | Extracts the response body as text |
+| `fromJSON()` | Converts JSON text into an R object |
+| `simplifyVector = FALSE` | Preserves nested JSON structures as lists |
+| `names()` | Displays the names of elements inside an R object |
+
+```{r}
+# Extract total matches for coffee in 2020
+metadata <- nyt_data$response[["metadata"]]
+
+if (is.null(metadata)) {
+  metadata <- nyt_data$response[["meta"]]
+}
+# Display the result
+coffee_hits_2020 <- metadata[["hits"]]
+
+```
+
+```{r}
+coffee_2020 <- tibble::tibble(
+  beverage = "Coffee",
+  year = 2020,
+  total_hits = as.integer(coffee_hits_2020)
+)
+
+print(coffee_2020)
+```
+
+My NYT API returned 2,066 matching results for coffee in 2020.
+
+### Preparing the Search Dataset
+
+```{r}
+search_grid <- tidyr::expand_grid(
+  beverage = c("Coffee", "Matcha", "Energy drinks"),
+  year = 2020:2025
+) |>
+  dplyr::mutate(
+    query = dplyr::case_when(
+      beverage == "Coffee" ~ "coffee",
+      beverage == "Matcha" ~ "matcha",
+      beverage == "Energy drinks" ~ '"energy drink"'
+    )
+  )
+
+print(search_grid)
+```
+
+Function and purpose
+
+|                 |                                                 |
+|-----------------|-------------------------------------------------|
+| `expand_grid()` | Creates all combinations of beverages and years |
+| `mutate()`      | Adds a new column                               |
+| `case_when()`   | Assigns a search term based on the beverage     |
+| `2020:2025`     | Creates the sequence of six years               |
+
+## Retrieving Annual Article Counts
+
+```{r}
+get_nyt_hits <- function(query, year) {
+  
+  # Create and send the API request
+  api_response <- httr2::request(endpoint) |>
+    httr2::req_url_query(
+      q = query,
+      begin_date = paste0(year, "0101"),
+      end_date = paste0(year, "1231"),
+      page = 0,
+      `api-key` = api_key
+    ) |>
+    httr2::req_timeout(30) |>
+    httr2::req_retry(max_tries = 3) |>
+    httr2::req_perform()
+  
+  # Parse the JSON response
+  parsed <- jsonlite::fromJSON(
+    httr2::resp_body_string(api_response),
+    simplifyVector = FALSE
+  )
+  
+  # Retrieve the exact metadata field
+  metadata <- parsed$response[["metadata"]]
+  
+  # Some API responses use 'meta'
+  if (is.null(metadata)) {
+    metadata <- parsed$response[["meta"]]
+  }
+  
+  # Verify that the count exists
+  if (is.null(metadata[["hits"]])) {
+    stop("The API response did not contain a hits count.")
+  }
+  
+  # Return the count as an integer
+  as.integer(metadata[["hits"]])
+}
+```
+
+Code and meaning
+
+|                         |                                                 |
+|-------------------------|-------------------------------------------------|
+| `function(query, year)` | Creates a function accepting a keyword and year |
+| `paste0(year, "0101")`  | Constructs January 1 for the selected year      |
+| `req_retry()`           | Retries certain temporary HTTP failures         |
+| `fromJSON()`            | Converts the JSON response into an R object     |
+| `[[ ]]`                 | Selects an element by its exact name            |
+| `if (is.null(...))`     | Checks whether an element is missing            |
+| `as.integer()`          | Converts the result into an integer             |
+
+```{r}
+get_nyt_hits("coffee", 2020)
+```
+
+```{r}
+nrow(search_grid)
+```
+
+```{r}
+nyt_counts <- search_grid |>
+  dplyr::mutate(
+    total_hits = purrr::map2_int(
+      query,
+      year,
+      function(q, y) {
+        Sys.sleep(16)
+        get_nyt_hits(q, y)
+      }
+    )
+  ) |>
+  dplyr::select(
+    beverage,
+    year,
+    total_hits
+  )
+
+print(nyt_counts)
+```
+
+`Sys.sleep(16)`: inserts a 16-second delay before each request for a conservative precaution against API rate limits.
+
+```{r}
+# Examine the structure
+dplyr::glimpse(nyt_counts)
+
+# Count rows
+nrow(nyt_counts)
+
+# Check missing values
+sum(is.na(nyt_counts$total_hits))
+
+# Check duplicate beverage-year combinations
+nyt_counts |>
+  dplyr::count(beverage, year) |>
+  dplyr::filter(n > 1)
+```
+
+```{r}
+print(nyt_counts)
+```
+
+```{r}
+dplyr::glimpse(nyt_counts)
+```
+
+## Calculating Summary Statistics
+
+Comparing the total number of matches for each beverage and measuring the change from 2020 to 2025.
+
+```{r}
+nyt_summary <- nyt_counts |>
+  dplyr::group_by(beverage) |>
+  dplyr::summarise(
+    total_articles = sum(total_hits),
+    avg_articles = mean(total_hits),
+    articles_2020 = total_hits[year == 2020],
+    articles_2025 = total_hits[year == 2025],
+    percent_change = dplyr::if_else(
+      articles_2020 > 0,
+      (articles_2025 - articles_2020) /
+        articles_2020 * 100,
+      NA_real_
+    ),
+    .groups = "drop"
+  ) |>
+  dplyr::arrange(dplyr::desc(percent_change))
+
+print(nyt_summary)
+```
+
+### Preliminary Findings
+
+The analysis revealed notable differences in New York Times keyword-search matches for coffee, matcha, and energy drinks between 2020 and 2025. Coffee had the highest cumulative number of matches, with 10,996 across the six-year period. However, its annual matches declined by approximately 14.2%, from 2,066 in 2020 to 1,773 in 2025.
+
+Matcha experienced the greatest relative increase, rising from 21 matches in 2020 to 125 in 2025, an increase of approximately 495%. Energy drinks showed a more modest increase of 18.5%.
+
+These results suggest that matcha became substantially more visible in New York Times keyword-search results over the study period, although coffee remained the most frequently matched beverage. Because the analysis relies on search matches, the findings should not be interpreted as direct measures of consumer popularity or beverage sales.
+
+## Visual Annual Trend
+
+```{r}
+ggplot2::ggplot(
+  nyt_counts,
+  ggplot2::aes(
+    x = year,
+    y = total_hits,
+    color = beverage
+  )
+) +
+  ggplot2::geom_line(linewidth = 1) +
+  ggplot2::geom_point(size = 2.5) +
+  ggplot2::facet_wrap(
+    ~ beverage,
+    scales = "free_y"
+  ) +
+  ggplot2::scale_x_continuous(
+    breaks = 2020:2025
+  ) +
+  ggplot2::labs(
+    title = "Annual NYT Search Matches by Beverage",
+    subtitle = "Each panel uses its own vertical scale",
+    x = "Publication Year",
+    y = "Number of Matches"
+  ) +
+  ggplot2::theme_minimal()
+```
+
+```{r}
+nyt_indexed <- nyt_counts |>
+  dplyr::group_by(beverage) |>
+  dplyr::arrange(year, .by_group = TRUE) |>
+  dplyr::mutate(
+    baseline_2020 = total_hits[year == 2020],
+    coverage_index = total_hits / baseline_2020 * 100
+  ) |>
+  dplyr::ungroup()
+
+print(nyt_indexed)
+```
+
+```{r}
+ggplot2::ggplot(
+  nyt_indexed,
+  ggplot2::aes(
+    x = year,
+    y = coverage_index,
+    color = beverage,
+    group = beverage
+  )
+) +
+  ggplot2::geom_hline(
+    yintercept = 100,
+    linetype = "dashed",
+    color = "gray55"
+  ) +
+  ggplot2::geom_line(linewidth = 1.4) +
+  ggplot2::geom_point(size = 3) +
+  ggplot2::scale_x_continuous(
+    breaks = 2020:2025
+  ) +
+  ggplot2::scale_y_continuous(
+    labels = function(x) paste0(x, "")
+  ) +
+  ggplot2::labs(
+    title = "How Has NYT Beverage Coverage Changed?",
+    subtitle = "Indexed annual search matches (2020 = 100)",
+    x = "Publication Year",
+    y = "Coverage Index",
+    color = "Beverage",
+    caption = paste(
+      "Source: NYT Article Search API.",
+      "Indexed trends show relative change, not article volume."
+    )
+  ) +
+  ggplot2::theme_minimal(base_size = 12) +
+  ggplot2::theme(
+    plot.title = ggplot2::element_text(
+      face = "bold",
+      size = 16
+    ),
+    legend.position = "bottom",
+    panel.grid.minor = ggplot2::element_blank()
+  )
+```
+
+This indexed graph does not show which beverage received the greatest number of matches. Coffee still had much greater absolute search volume. The chart intentionally highlights relative change, not total volume.
+
+## Data Cleaning and Validation
+
+```{r}
+# Confirm the number of observations
+nrow(nyt_counts)
+
+# Confirm the number of variables
+ncol(nyt_counts)
+
+# Check for missing values
+colSums(is.na(nyt_counts))
+
+# Check for duplicate beverage-year combinations
+nyt_counts |>
+  dplyr::count(beverage, year) |>
+  dplyr::filter(n > 1)
+
+# Display the final tidy data frame
+print(nyt_counts)
+```
+
+### Cleaning Decisions
+
+The New York Times Article Search API returned JSON responses containing article records and search metadata. I used the `jsonlite` package to parse the JSON data and extracted the total number of keyword-search matches from the response metadata.
+
+I organized the results into a tidy data frame containing three variables: beverage, year, and total hits. I standardized the beverage names and verified that the final dataset contained 18 observations, representing three beverages across six years.
+
+I also checked for missing values and duplicate beverage-year combinations. Because the analysis uses aggregate search counts rather than individual article records, article-level deduplication was not performed.
+
+One limitation is that an article may match more than one beverage keyword. Additionally, the results represent matches in the New York Times search index rather than verified counts of articles primarily discussing each beverage. Therefore, the findings should be interpreted as patterns in indexed media coverage rather than direct measures of consumer interest or sales.
+
+# Conclusion
+
+The New York Times Article Search API analysis identified distinct patterns in keyword-search matches for coffee, matcha, and energy drinks between 2020 and 2025.
+
+Coffee consistently generated the highest number of matches, with 10,996 across the six-year period. However, its annual matches decreased by approximately 14.2%, from 2,066 in 2020 to 1,773 in 2025.
+
+Matcha experienced the greatest relative increase, rising from 21 matches in 2020 to 125 in 2025, representing approximately 495.2% growth. The largest increase occurred between 2024 and 2025, when matcha-related matches increased by 212.5%.
+
+Energy drinks showed a more modest overall increase of approximately 18.5%, with annual counts fluctuating throughout the study period.
+
+Overall, coffee remained the most frequently matched beverage, while matcha demonstrated the greatest relative growth in New York Times search results. These findings suggest increased visibility of matcha in the search index, particularly in 2025, but do not establish changes in beverage consumption or consumer demand.
+
+## API Endpoint and Request Parameters
+
+| Parameter | Value | Purpose |
+|----|----|----|
+| Endpoint | `/svc/search/v2/articlesearch.json` | Article Search API |
+| `q` | coffee, matcha, `"energy drink"` | Search keywords |
+| `begin_date` | January 1 of each year | Starting date |
+| `end_date` | December 31 of each year | Ending date |
+| `page` | 0 | First page of the search results |
+| `api-key` | Environment variable | Authentication |
+
+References
+
+- New York Times Developer Network. [Article Search API documentation](https://developer.nytimes.com/docs/articlesearch-product/1/overview?utm_source=chatgpt.com).
+
+- Wickham, H. [httr2: Perform HTTP Requests and Process the Responses](https://httr2.r-lib.org/?utm_source=chatgpt.com).
+
+- Ooms, J. [jsonlite: A Robust, High Performance JSON Parser and Generator for R](https://cran.r-project.org/package=jsonlite?utm_source=chatgpt.com)
+
+- OpenAI. (2026). ChatGPT (GPT-6) \[Large language model\]. <https://chatgpt.com/>
