@@ -1,0 +1,773 @@
+---
+title: "Assignment10A | Sentiment Analysis "
+author: "Yeimi Perez"
+date: "2026-11-02"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# Approach
+
+For this assignment, I will reproduce the sentiment analysis example from Chapter 2 of *Text Mining with R* using Jane Austen's novels. I will use the `tidytext` package in R to tokenize the text and apply the NRC, Bing, and AFINN sentiment lexicons to examine patterns in positive and negative language. To extend the analysis, I will use a different text corpus consisting of U.S. presidential inaugural addresses. I will also introduce the Syuzhet sentiment lexicon to compare how different dictionaries evaluate the same text.
+
+# Introduction 
+
+This assignment reproduces the sentiment analysis examples from Chapter 2 of *Text Mining with R* by Silge and Robinson (2017), using Jane Austen's novels and the NRC, Bing, and AFINN sentiment lexicons.To extend the analysis, I will examine U.S. presidential inaugural addresses and introduce the Syuzhet sentiment lexicon to compare sentiment patterns across different texts and methods.
+
+**Research Question:** How does sentiment vary across U.S. presidential inaugural addresses, and how do different sentiment lexicons influence the results?
+
+The original example code is adapted from [Silge and Robinson's Chapter 2](https://www.tidytextmining.com/sentiment).
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(ggplot2)
+library(tidytext)
+library(janeaustenr)
+library(quanteda)
+library(syuzhet)
+library(knitr)
+```
+
+## Reproduce Chapter 2
+
+Jane Austen - Make the novels tidy
+
+The authors tokenize Jane Austen's novels into one word per row, retaining each word's book and line number. This is the central preparation step in Chapter 2.
+
+```{r}
+tidy_books <- janeaustenr::austen_books() %>%
+  group_by(book) %>%
+  mutate(
+    linenumber = row_number(),
+    chapter = cumsum(
+      str_detect(text, regex("^chapter [\\divxlc]", ignore_case = TRUE))
+    )
+  ) %>%
+  ungroup() %>%
+  unnest_tokens(word, text)
+
+print(head(tidy_books, 8))
+cat("Number of novels:", n_distinct(tidy_books$book), "\n")
+```
+
+## Sentiment analysis across Austen novels
+
+I will retrieve Jane Austen's six completed novels and convert the text into individual word tokens and prepared the original corpus for sentiment analysis.
+
+```{r}
+tidy_books <- janeaustenr::austen_books() %>%
+  group_by(book) %>%
+  mutate(
+    linenumber = row_number(),
+    chapter = cumsum(
+      stringr::str_detect(
+        text,
+        stringr::regex(
+          "^chapter [\\divxlc]",
+          ignore_case = TRUE
+        )
+      )
+    )
+  ) %>%
+  ungroup() %>%
+  tidytext::unnest_tokens(word, text)
+
+# Display the first 10 rows
+print(head(tidy_books, 10))
+
+# Confirm the number of novels
+print(dplyr::n_distinct(tidy_books$book))
+
+# Examine the dataset structure
+dplyr::glimpse(tidy_books)
+
+```
+
+### NRC Sentiment Analysis: Identifying Joy-Associated Words in Emma
+
+The NRC Word-Emotion Association Lexicon categorizes words according to different emotions, including joy, trust, fear, anger, and sadness. In Chapter 2 of *Text Mining with R*, Silge and Robinson (2017) use this lexicon to identify words associated with joy in Jane Austen's *Emma*.
+
+To reproduce this example, I will filter the NRC lexicon to include only joy-associated words, match those words with the text of *Emma*, and calculate their frequencies. This analysis will help identify which joy-related terms occur most frequently in the novel.
+
+```{r}
+nrc_joy <- get_sentiments("nrc") %>%
+  filter(sentiment == "joy")
+
+# Match NRC joy words with Emma
+emma_joy <- tidy_books %>%
+  filter(book == "Emma") %>%
+  inner_join(nrc_joy, by = "word") %>%
+  count(word, sort = TRUE)
+
+# Display the 10 most frequent joy words
+print(head(emma_joy, 10))
+```
+
+**Interpretation:** The NRC sentiment analysis identified frequently occurring words associated with joy in Jane Austen's *Emma*. By matching the novel's text with the NRC lexicon, I was able to examine which joy-related terms appeared most often.
+
+This example demonstrates how sentiment dictionaries can transform written language into measurable word-frequency patterns. However, the presence of a joy-associated word does not necessarily mean that the entire sentence expresses happiness, since the surrounding context may influence its meaning.
+
+```{r}
+library(tidytext)
+library(dplyr)
+
+nrc_joy <- get_sentiments("nrc") %>%
+  filter(sentiment == "joy")
+
+print(head(nrc_joy, 10))
+```
+
+### Bing Sentiment Analysis: Measuring Positive and Negative Sentiment Across Jane Austen's Novels
+
+I will reproduce the Bing sentiment analysis from Chapter 2 of *Text Mining with R*. Unlike the NRC analysis, which focused on joy-associated words in *Emma*, the Bing lexicon classifies words as either positive or negative.
+
+I will divide Jane Austen's novels into sections of approximately 80 lines, count the positive and negative words in each section, and calculate the difference to measure net sentiment. I will then visualize how sentiment changes throughout the six novels.
+
+```{r}
+# Calculate positive and negative sentiment across novels
+jane_sentiment <- tidy_books %>%
+  inner_join(
+    get_sentiments("bing"),
+    by = "word"
+  ) %>%
+  count(
+    book,
+    index = linenumber %/% 80,
+    sentiment
+  ) %>%
+  pivot_wider(
+    names_from = sentiment,
+    values_from = n,
+    values_fill = 0
+  ) %>%
+  mutate(
+    net_sentiment = positive - negative
+  )
+
+# Display the first 10 observations
+print(head(jane_sentiment, 10))
+
+# Verify that all six novels are represented
+print(n_distinct(jane_sentiment$book))
+
+```
+
+### Visualizing Sentiment Patterns Across the Novels
+
+```{r}
+ggplot(
+  jane_sentiment,
+  aes(
+    x = index,
+    y = net_sentiment,
+    fill = book
+  )
+) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(
+    ~ book,
+    ncol = 2,
+    scales = "free_x"
+  ) +
+  labs(
+    title = "Sentiment Throughout Jane Austen's Novels",
+    subtitle = "Bing Positive and Negative Word Analysis",
+    x = "Narrative Section (80-Line Groups)",
+    y = "Net Sentiment Score"
+  ) +
+  theme_minimal()
+
+```
+
+- Positive fluctuations: Sections with more positive than negative word matches.
+
+- Negative fluctuations: Sections with more negative than positive word matches.
+
+- Variation across novels: Differences in the frequency and magnitude of these fluctuations.
+
+**Interpretation:** The Bing sentiment analysis demonstrates how positive and negative language fluctuates throughout Jane Austen's novels. By dividing the text into approximately 80-line sections, I was able to calculate net sentiment scores and visualize how the balance of positive and negative words changes across the narratives.
+
+The visualizations show that sentiment is not constant throughout a novel. Instead, the frequency of positive and negative language varies across different sections. This analysis also highlights an important limitation of dictionary-based sentiment analysis: individual word classifications may not fully capture the intended meaning or emotional context of a passage.
+
+## Comparing AFINN, Bing, and NRC in *Pride & Prejudice*
+
+I will reproduce the sentiment lexicon comparison from Chapter 2 of *Text Mining with R* by applying AFINN, Bing, and NRC to Jane Austen's *Pride & Prejudice*.
+
+Although all three lexicons measure sentiment, they use different scoring methods. AFINN assigns numerical values to words, while Bing and NRC classify words as positive or negative.
+
+By calculating sentiment across 80-line sections of the novel, I will compare whether these methods identify similar patterns throughout the narrative.
+
+```{r}
+pride_prejudice <- tidy_books %>%
+  filter(book == "Pride & Prejudice")
+
+# Preview the selected novel
+print(head(pride_prejudice, 10))
+
+# Verify the number of word tokens
+print(nrow(pride_prejudice))
+
+```
+
+### AFINN Sentiment Analysis
+
+```{r}
+afinn_results <- pride_prejudice %>%
+  inner_join(
+    get_sentiments("afinn"),
+    by = "word"
+  ) %>%
+  group_by(
+    index = linenumber %/% 80
+  ) %>%
+  summarise(
+    sentiment = sum(value),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    method = "AFINN"
+  )
+
+# Display the first 10 results
+print(head(afinn_results, 10))
+
+```
+
+### Bing and NRC Sentiment Analysis
+
+```{r}
+bing_nrc_results <- bind_rows(
+  
+  # Bing sentiment
+  pride_prejudice %>%
+    inner_join(
+      get_sentiments("bing"),
+      by = "word"
+    ) %>%
+    mutate(method = "Bing"),
+  
+  # NRC positive and negative sentiment
+  pride_prejudice %>%
+    inner_join(
+      get_sentiments("nrc") %>%
+        filter(
+          sentiment %in% c("positive", "negative")
+        ),
+      by = "word"
+    ) %>%
+    mutate(method = "NRC")
+  
+) %>%
+  count(
+    method,
+    index = linenumber %/% 80,
+    sentiment
+  ) %>%
+  pivot_wider(
+    names_from = sentiment,
+    values_from = n,
+    values_fill = 0
+  ) %>%
+  mutate(
+    sentiment = positive - negative
+  )
+
+# Display the first 10 observations
+print(head(bing_nrc_results, 10))
+
+```
+
+### Combining the Sentiment Results
+
+```{r}
+lexicon_comparison <- bind_rows(
+  
+  afinn_results,
+  
+  bing_nrc_results %>%
+    select(index, sentiment, method)
+  
+)
+
+# Display the combined results
+print(head(lexicon_comparison, 10))
+
+# Verify all three lexicons are present
+print(unique(lexicon_comparison$method))
+
+```
+
+### Visualizing the Three Sentiment Lexicons
+
+```{r}
+ggplot(
+  lexicon_comparison,
+  aes(
+    x = index,
+    y = sentiment,
+    fill = method
+  )
+) +
+  geom_col(
+    show.legend = FALSE
+  ) +
+  facet_wrap(
+    ~ method,
+    ncol = 1,
+    scales = "free_y"
+  ) +
+  labs(
+    title = "Comparing Sentiment Lexicons",
+    subtitle = "Pride & Prejudice by Jane Austen",
+    x = "Narrative Section (80-Line Groups)",
+    y = "Sentiment Score"
+  ) +
+  theme_minimal()
+
+```
+
+**Interpretation:** The comparison of AFINN, Bing, and NRC demonstrates how different sentiment dictionaries can produce different numerical results when analyzing the same text. In *Pride & Prejudice*, the three methods identify broadly similar positive and negative fluctuations throughout the narrative, although the magnitude of the sentiment scores differs.
+
+AFINN uses weighted numerical values, while Bing and NRC calculate net sentiment from positive and negative word classifications. As discussed by Silge and Robinson (2017), these methodological differences influence the resulting scores. This comparison highlights the importance of considering the sentiment lexicon when interpreting text-mining results.
+
+# Extended Sentiment Analysis
+
+## Introducing a New Text Corpus: U.S. Presidential Inaugural Addresses
+
+To extend the original Chapter 2 sentiment analysis, I selected U.S. presidential inaugural addresses as a different text corpus. Unlike Jane Austen's novels, which follow fictional narratives, inaugural addresses are speeches that communicate national priorities, challenges, and future goals. I will retrieve presidential inaugural addresses from 1961 onward and prepare them for sentiment analysis. I selected this corpus to investigate how positive and negative language varies across speeches and to compare how different sentiment lexicons evaluate the same text.
+
+```{r}
+# Loading the corpus from the quanteda package
+data("data_corpus_inaugural", package = "quanteda")
+
+# Convert the corpus into a tidy data frame
+speeches <- tibble(
+  year = as.integer(
+    quanteda::docvars(
+      data_corpus_inaugural, "Year"
+    )
+  ),
+  president = as.character(
+    quanteda::docvars(
+      data_corpus_inaugural, "President"
+    )
+  ),
+  text = as.character(data_corpus_inaugural)
+) %>%
+  filter(year >= 1961) %>%
+  mutate(
+    speech = paste(year, president)
+  ) %>%
+  arrange(year)
+
+# Display the first six observations
+print(
+  speeches %>%
+    select(year, president, speech) %>%
+    head(6)
+)
+
+# Display the total number of speeches
+print(
+  paste("Number of speeches:", nrow(speeches))
+)
+
+# Examine the structure of the dataset
+glimpse(speeches)
+
+```
+
+**Interpretation:** The `quanteda` package provided a collection of U.S. presidential inaugural addresses, including the year, president, and full speech text. I filtered the dataset to include speeches delivered from 1961 onward and created a unique identifier for each address.
+
+This dataset will allow me to apply sentiment analysis to a different type of text while maintaining the same general methodology used in the original Jane Austen example. The next stage will involve tokenizing the speeches so that individual words can be matched with sentiment dictionaries.
+
+### Preparing Presidential Inaugural Addresses for Sentiment Analysis
+
+Before applying sentiment lexicons, I will convert the presidential inaugural addresses into tidy text using the `unnest_tokens()` function. This process separates each speech into individual words while retaining the year, president, and speech identifier.
+
+I will also calculate the total number of word tokens in each speech. Because inaugural addresses vary in length, these counts will allow me to normalize sentiment scores and compare the speeches on a more consistent basis.
+
+```{r}
+# Convert each speech into individual word tokens
+speech_words <- speeches %>%
+  select(
+    year,
+    president,
+    speech,
+    text
+  ) %>%
+  unnest_tokens(word, text)
+
+# Display the first 10 word observations
+print(head(speech_words, 10))
+
+# Count the total number of word tokens in each speech
+speech_lengths <- speech_words %>%
+  count(
+    speech,
+    year,
+    president,
+    name = "total_tokens"
+  ) %>%
+  arrange(year)
+
+# Display the number of tokens in each speech
+print(speech_lengths)
+
+# Verify the total number of speeches
+print(
+  paste(
+    "Number of speeches:",
+    nrow(speech_lengths)
+  )
+)
+
+# Verify that the token count matches the dataset
+print(
+  paste(
+    "Total word tokens:",
+    sum(speech_lengths$total_tokens)
+  )
+)
+
+```
+
+**Interpretation:** The presidential inaugural addresses were successfully converted into tidy text using `unnest_tokens()`, resulting in one word per row. Each word remains associated with its original speech, year, and president.
+
+I also calculated the total number of word tokens for each address. This step is important because inaugural speeches vary in length, and comparing raw sentiment counts alone could be misleading. By retaining the speech lengths, I will be able to calculate normalized sentiment scores per 1,000 tokens in the next stage of the analysis.
+
+### Bing Sentiment Analysis of Presidential Inaugural Addresses
+
+In this section, I will apply the Bing sentiment lexicon to U.S. presidential inaugural addresses. This extends the original Chapter 2 analysis by using the same sentiment classification method on a different text corpus.
+
+The Bing lexicon identifies words as positive or negative. I will calculate the frequency of each category within every speech and determine the net sentiment by subtracting negative word counts from positive word counts.
+
+Because the inaugural addresses differ in length, I will normalize the sentiment scores per 1,000 word tokens to make comparisons across speeches more meaningful.
+
+```{r}
+# Match speech words with Bing sentiment classifications
+bing_speeches <- speech_words %>%
+  inner_join(
+    get_sentiments("bing"),
+    by = "word"
+  ) %>%
+  count(
+    speech,
+    year,
+    president,
+    sentiment
+  ) %>%
+  pivot_wider(
+    names_from = sentiment,
+    values_from = n,
+    values_fill = 0
+  ) %>%
+  right_join(
+    speech_lengths,
+    by = c("speech", "year", "president")
+  ) %>%
+  mutate(
+    positive = replace_na(positive, 0L),
+    negative = replace_na(negative, 0L),
+    net_sentiment = positive - negative,
+    bing_per_1000 =
+      net_sentiment / total_tokens * 1000
+  ) %>%
+  arrange(desc(bing_per_1000))
+
+# Display results from highest to lowest
+print(
+  bing_speeches %>%
+    select(
+      year,
+      president,
+      positive,
+      negative,
+      total_tokens,
+      net_sentiment,
+      bing_per_1000
+    ) %>%
+    mutate(
+      bing_per_1000 = round(bing_per_1000, 2)
+    )
+)
+
+```
+
+### Visualizing Bing Sentiment Across Presidential Inaugural Addresses
+
+```{r}
+ggplot(
+  bing_speeches,
+  aes(
+    x = reorder(speech, bing_per_1000),
+    y = bing_per_1000
+  )
+) +
+  geom_col(
+    fill = "steelblue",
+    width = 0.75
+  ) +
+  coord_flip() +
+  labs(
+    title = "Bing Sentiment Across Presidential Inaugural Addresses",
+    subtitle = "Net sentiment normalized per 1,000 word tokens",
+    x = "Presidential Inaugural Address",
+    y = "Net Bing Sentiment per 1,000 Tokens"
+  ) +
+  theme_minimal()
+
+```
+
+**Interpretation:** The Bing sentiment analysis allowed me to compare positive and negative language across U.S. presidential inaugural addresses. By calculating net sentiment and normalizing the scores per 1,000 word tokens, I was able to account for differences in speech length.
+
+The visualization shows how sentiment varies across the speeches, with higher scores representing a greater frequency of positive relative to negative dictionary matches. Unlike the original Jane Austen analysis, which examined sentiment changes throughout fictional narratives, this extension compares overall sentiment across individual political speeches.
+
+Although the scores provide an useful measure of sentiment-associated word usage, they do not fully capture the context or intended meaning of each speech.
+
+### Additional Sentiment Lexicon: Syuzhet
+
+To further extend the original sentiment analysis, I will introduce the Syuzhet sentiment lexicon using the `syuzhet` R package. Unlike the Bing lexicon, which classifies words as positive or negative, Syuzhet assigns weighted numerical sentiment scores.
+
+I will apply Syuzhet to the same presidential inaugural addresses analyzed in the previous section. By calculating and normalizing the sentiment scores per 1,000 tokens, I will be able to compare how different sentiment dictionaries evaluate the same collection of speeches.
+
+```{r}
+# Create a lookup table of unique words and sentiment values
+syuzhet_words <- speech_words %>%
+  distinct(word) %>%
+  mutate(
+    value = syuzhet::get_sentiment(
+      word,
+      method = "syuzhet"
+    )
+  )
+
+# Calculate the weighted sentiment for each speech
+syuzhet_speeches <- speech_words %>%
+  left_join(
+    syuzhet_words,
+    by = "word"
+  ) %>%
+  group_by(
+    speech,
+    year,
+    president
+  ) %>%
+  summarise(
+    total_score = sum(value, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  left_join(
+    speech_lengths,
+    by = c("speech", "year", "president")
+  ) %>%
+  mutate(
+    syuzhet_per_1000 =
+      total_score / total_tokens * 1000
+  ) %>%
+  arrange(desc(syuzhet_per_1000))
+
+# Display the results
+print(
+  syuzhet_speeches %>%
+    select(
+      year,
+      president,
+      total_tokens,
+      total_score,
+      syuzhet_per_1000
+    ) %>%
+    mutate(
+      total_score = round(total_score, 2),
+      syuzhet_per_1000 = round(syuzhet_per_1000, 2)
+    )
+)
+
+# Verify that all speeches are represented
+print(
+  paste(
+    "Number of speeches analyzed:",
+    nrow(syuzhet_speeches)
+  )
+)
+
+```
+
+### Visualizing Syuzhet Sentiment Across Presidential Inaugural Addresses
+
+```{r}
+ggplot(
+  syuzhet_speeches,
+  aes(
+    x = reorder(speech, syuzhet_per_1000),
+    y = syuzhet_per_1000
+  )
+) +
+  geom_col(
+    fill = "darkorange",
+    width = 0.75
+  ) +
+  coord_flip() +
+  labs(
+    title = "Syuzhet Sentiment Across Inaugural Addresses",
+    subtitle = "Weighted sentiment per 1,000 word tokens",
+    x = "Presidential Inaugural Address",
+    y = "Syuzhet Score per 1,000 Tokens"
+  ) +
+  theme_minimal()
+
+```
+
+**Interpretation:** The Syuzhet sentiment analysis provided an additional method for evaluating positive and negative language across presidential inaugural addresses. Unlike Bing, which calculates sentiment using positive and negative word counts, Syuzhet assigns weighted numerical values to individual words.
+
+After normalizing the scores per 1,000 tokens, I was able to compare the relative sentiment of speeches of different lengths. The resulting visualization provides an alternative perspective on sentiment patterns within the inaugural-address corpus.
+
+Because the two lexicons use different scoring systems, their numerical scores should not be interpreted as directly equivalent. The next stage will compare the rankings produced by Bing and Syuzhet to evaluate the consistency of their results.
+
+## Comparison of Bing and Syuzhet Sentiment Results
+
+To evaluate how sentiment lexicon selection influences the results, I will compare the Bing and Syuzhet sentiment scores calculated for the presidential inaugural addresses.
+
+Both methods were applied to the same speeches, and their scores were normalized per 1,000 word tokens. However, Bing calculates sentiment using positive and negative word frequencies, while Syuzhet assigns weighted numerical values.
+
+I will combine the results, create a comparative visualization, and calculate Spearman rank correlation to determine whether the two lexicons produce similar rankings across speeches.
+
+```{r}
+sentiment_comparison <- bing_speeches %>%
+  select(
+    speech,
+    year,
+    president,
+    bing_per_1000
+  ) %>%
+  inner_join(
+    syuzhet_speeches %>%
+      select(
+        speech,
+        syuzhet_per_1000
+      ),
+    by = "speech"
+  ) %>%
+  arrange(year)
+
+# Display a formatted comparison table
+sentiment_comparison %>%
+  mutate(
+    bing_per_1000 = round(bing_per_1000, 2),
+    syuzhet_per_1000 = round(syuzhet_per_1000, 2)
+  ) %>%
+  knitr::kable(
+    caption = "Comparison of Bing and Syuzhet Sentiment Scores"
+  )
+
+# Verify that all speeches are represented
+print(
+  paste(
+    "Speeches in comparison:",
+    nrow(sentiment_comparison)
+  )
+)
+
+```
+
+### Visualizing the Relationship Between Bing and Syuzhet
+
+```{r}
+ggplot(
+  sentiment_comparison,
+  aes(
+    x = bing_per_1000,
+    y = syuzhet_per_1000
+  )
+) +
+  geom_point(
+    color = "steelblue",
+    size = 3,
+    alpha = 0.8
+  ) +
+  geom_smooth(
+    method = "lm",
+    se = FALSE,
+    color = "darkorange"
+  ) +
+  labs(
+    title = "Bing vs. Syuzhet Sentiment Scores",
+    subtitle = "U.S. Presidential Inaugural Addresses, 1961 Onward",
+    x = "Bing Net Sentiment per 1,000 Tokens",
+    y = "Syuzhet Weighted Sentiment per 1,000 Tokens"
+  ) +
+  theme_minimal()
+
+```
+
+### Spearman Rank Correlation
+
+```{r}
+spearman_result <- cor(
+  sentiment_comparison$bing_per_1000,
+  sentiment_comparison$syuzhet_per_1000,
+  method = "spearman",
+  use = "complete.obs"
+)
+
+# Display the correlation coefficient
+print(
+  paste(
+    "Spearman correlation:",
+    round(spearman_result, 3)
+  )
+)
+
+```
+
+### Highest-Scoring Inaugural Addresses
+
+```{r}
+# Highest normalized Bing sentiment
+top_bing <- sentiment_comparison %>%
+  slice_max(
+    order_by = bing_per_1000,
+    n = 1,
+    with_ties = TRUE
+  )
+
+# Highest normalized Syuzhet sentiment
+top_syuzhet <- sentiment_comparison %>%
+  slice_max(
+    order_by = syuzhet_per_1000,
+    n = 1,
+    with_ties = TRUE
+  )
+
+# Display the results
+print("Highest Bing Sentiment:")
+print(top_bing)
+
+print("Highest Syuzhet Sentiment:")
+print(top_syuzhet)
+
+```
+
+**Interpretation:** Comparing Bing and Syuzhet allowed me to examine how two different sentiment-scoring methods evaluate the same presidential inaugural addresses. Although both methods were normalized per 1,000 tokens, they use different approaches to assigning sentiment values.
+
+The comparison scatterplot provides a visual representation of the relationship between the two methods, while Spearman rank correlation measures how similarly the speeches are ranked.
+
+These results are important because they demonstrate that sentiment analysis can be influenced by the choice of lexicon. The findings will be discussed alongside the original Jane Austen example to evaluate how sentiment-analysis methods behave across different text corpora.
+
+## Conclusion
+
+By analyzing Jane Austen's novels with the NRC, Bing, and AFINN lexicons, I learned how to tokenize text, calculate sentiment scores, and visualize changes in positive and negative language throughout a narrative.
+
+For my extended analysis, I applied the same text-mining techniques to U.S. presidential inaugural addresses and introduced Syuzhet as an additional sentiment lexicon. Comparing Bing and Syuzhet allowed me to examine how different scoring methods evaluate the same text and whether they produce similar sentiment rankings.
+
+This analysis highlights the importance of selecting appropriate sentiment lexicons and interpreting results within the context of the documents being studied. Although lexicon-based sentiment analysis provides a systematic way to identify language patterns, it does not fully capture the complexity of human language, including context, negation, and intended meaning.
