@@ -1,0 +1,826 @@
+---
+title: "Assignment 10B: NobelPrize.org | JSON Practice"
+author: "Yeimi Perez"
+format: html
+editor: visual
+---
+
+# Approach
+
+For this assignment, I will use the Nobel Prize API to retrieve publicly available data in JSON format and analyze it using R. I will use packages such as `httr2`, `jsonlite`, `dplyr`, `tidyr`, and `ggplot2` to retrieve, clean, organize, and visualize the data. My analysis will focus on four research questions exploring gender representation over time, age differences across Nobel Prize categories, multiple-award recipients, and international mobility among laureates. I will transform the nested JSON data into tidy data frames and use filtering, grouping, calculations, and joins to answer each question supported by summary tables and visualizations.
+
+### Data Driven Questions
+
+1.  How has the percentage of Nobel Prize awards received by women changed across decades, from 1901 to 2026?
+2.  Which Nobel Prize categories tend to recognize laureates at younger or older ages?
+3.  Which laureates have received more than one Nobel Prize, and did they win in the same category or different categories?
+4.  Which birth countries have the most Nobel laureates affiliated with institutions in another country at the time of their award?
+
+## Introduction
+
+The Nobel Prize has recognized outstanding contributions in science, literature, peace, and economics for more than a century. The Nobel Prize organization provides publicly available data through its API, allowing researchers to explore information about laureates, award categories, years, and personal backgrounds.
+
+For this assignment, I will use JSON data from the Nobel Prize API to investigate four questions about gender representation, age at the time of recognition, multiple-award recipients, and international mobility. My goal is to identify meaningful patterns in Nobel Prize history while practicing how to retrieve, transform, and analyze nested JSON data using R. I will organize the information into tidy data frames and present my findings through tables and visualizations.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(httr2)
+library(jsonlite)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+library(knitr)
+```
+
+## Retrieving Nobel Prize Data
+
+The Nobel Prize API provides access to information about laureates and their awards. I will use API version 2.1 to retrieve the data in JSON format. First, I will test the connection by requesting a small sample of records before retrieving the complete dataset for analysis.
+
+```{r}
+#| label: retrieve-nobel-data
+
+# Define the Nobel Prize API endpoint
+nobel_url <- "https://api.nobelprize.org/2.1/laureates"
+
+# Request a sample of 10 laureates
+response <- request(nobel_url) |>
+  req_url_query(limit = 10, offset = 0) |>
+  req_perform()
+
+# Check the HTTP response status
+resp_status(response)
+```
+
+### Exploring the JSON Structure
+
+After retrieving the data from the Nobel Prize API, I will examine the structure of the JSON response to understand how laureate information is organized. This step will help me identify the variables needed for my research questions and determine how to transform the nested data into tidy data frames.
+
+```{r}
+#| label: explore-json
+
+# Convert the API response from JSON into an R list
+nobel_json <- resp_body_json(response, simplifyVector = FALSE)
+
+# Identify the main sections of the JSON response
+names(nobel_json)
+
+# Count the laureate records returned
+length(nobel_json$laureates)
+
+# Examine the structure of the first laureate
+str(nobel_json$laureates[[1]], max.level = 2)
+```
+
+### Transforming JSON into a Tidy Data Frame
+
+The Nobel Prize API returns nested JSON data containing information about individual laureates and their awards. To prepare the data for analysis, I will extract selected fields, including laureate ID, name, gender, birth date, and birth country. Each row will represent one laureate, making it easier to explore their characteristics and connect their information to Nobel Prize records later in the analysis.
+
+```{r}
+#| label: tidy-laureates
+
+# Helper function to safely extract nested JSON values
+get_value <- function(x, path) {
+  for (field in path) {
+    if (is.null(x) || is.null(x[[field]])) {
+      return(NA_character_)
+    }
+    x <- x[[field]]
+  }
+  as.character(x)
+}
+
+# Convert the JSON records into a tidy data frame
+laureates_sample <- purrr::map_dfr(
+  nobel_json$laureates,
+  function(person) {
+    tibble(
+      laureate_id = get_value(person, c("id")),
+      name = get_value(person, c("knownName", "en")),
+      gender = get_value(person, c("gender")),
+      birth_date = get_value(person, c("birth", "date")),
+      birth_country = get_value(
+        person, c("birth", "place", "countryNow", "en")
+      )
+    )
+  }
+)
+
+# Display our tidy data frame
+knitr::kable(laureates_sample)
+```
+
+```{r}
+nrow(laureates_sample)
+names(laureates_sample)
+```
+
+### Retrieving the Complete Dataset
+
+After successfully transforming the sample JSON data, I will retrieve the complete Nobel laureate dataset. Since the API supports pagination, I will use the `limit` and `offset` parameters to retrieve records in batches. This approach ensures that all available laureates are included in the analysis rather than relying on a limited sample.
+
+```{r}
+#| label: retrieve-all-laureates
+
+# Number of laureates requested per API call
+page_size <- 100
+
+# Create an empty list to store each batch
+all_pages <- list()
+
+# Begin with the first record
+offset <- 0
+
+repeat {
+  
+  # Request a batch of laureates
+  response_page <- request(nobel_url) |>
+    req_url_query(limit = page_size, offset = offset) |>
+    req_perform()
+  
+  # Convert JSON response into an R list
+  page_data <- resp_body_json(
+    response_page,
+    simplifyVector = FALSE
+  )
+  
+  # Extract laureate records
+  records <- page_data$laureates
+  
+  # Stop if no more records are returned
+  if (length(records) == 0) break
+  
+  # Store the current batch
+  all_pages[[length(all_pages) + 1]] <- records
+  
+  # Stop after the final partial batch
+  if (length(records) < page_size) break
+  
+  # Move to the next batch
+  offset <- offset + page_size
+}
+
+# Combine all batches into one list
+all_laureates <- unlist(all_pages, recursive = FALSE)
+
+# Count the total records retrieved
+length(all_laureates)
+```
+
+### Creating the Complete Laureates Data Frame
+
+After retrieving all available laureate records, I will transform the nested JSON data into a tidy data frame. Each row will represent one laureate, with columns containing their unique ID, name, gender, birth date, and birth country. I will also check for missing values and duplicate IDs to assess the quality of the dataset before beginning the analysis.
+
+```{r}
+#| label: tidy-all-laureates
+
+# Transform all laureate records into a tidy data frame
+laureates <- purrr::map_dfr(
+  all_laureates,
+  function(person) {
+    tibble(
+      laureate_id = get_value(person, c("id")),
+      name = get_value(person, c("knownName", "en")),
+      gender = get_value(person, c("gender")),
+      birth_date = get_value(person, c("birth", "date")),
+      birth_country = get_value(
+        person, c("birth", "place", "countryNow", "en")
+      )
+    )
+  }
+)
+
+# Display the first 10 records
+knitr::kable(head(laureates, 10))
+```
+
+```{r}
+#| label: validate-laureates
+
+# Check the number of rows and columns
+dim(laureates)
+
+# Count missing values in each column
+colSums(is.na(laureates))
+
+# Check for duplicate laureate IDs
+sum(duplicated(laureates$laureate_id))
+```
+
+### Extracting Nobel Prize Award Information
+
+The Nobel Prize JSON data contains a nested field called `nobelPrizes`, which stores information about each laureate's awards. I will extract the award year, category, and prize portion into a separate tidy data frame. Each row will represent one Nobel Prize received by a laureate. Keeping award information separate from demographic information will allow me to join the datasets and investigate patterns across categories and years.
+
+```{r}
+#| label: tidy-nobel-awards
+
+# Extract Nobel Prize records for each laureate
+awards <- purrr::map_dfr(
+  all_laureates,
+  function(person) {
+    
+    # Retrieve the laureate's Nobel Prizes
+    prizes <- person$nobelPrizes
+    
+    # Skip records without Nobel Prize information
+    if (is.null(prizes) || length(prizes) == 0) {
+      return(tibble())
+    }
+    
+    # Create one row for each award
+    purrr::map_dfr(
+      prizes,
+      function(prize) {
+        tibble(
+          laureate_id = get_value(person, c("id")),
+          award_year = as.integer(
+            get_value(prize, c("awardYear"))
+          ),
+          category = get_value(
+            prize, c("category", "en")
+          ),
+          prize_portion = get_value(
+            prize, c("portion")
+          )
+        )
+      }
+    )
+  }
+)
+
+# Display the first 10 award records
+knitr::kable(head(awards, 10))
+```
+
+```{r}
+# Number of award-recipient records
+nrow(awards)
+
+# Identify available Nobel Prize categories
+unique(awards$category)
+
+# Check for missing award years or categories
+colSums(is.na(awards))
+```
+
+## Question 1
+
+How has the percentage of Nobel Prize awards received by women changed across decades, from 1901 to 2026?
+
+To investigate this question, I will combine the laureate demographic data with the Nobel Prize award records using their shared `laureate_id` field. This will allow me to compare gender representation across different award years and calculate the percentage of awards received by women in each decade.
+
+```{r}
+#| label: join-laureates-awards
+
+# Join laureate information with Nobel Prize awards
+nobel_combined <- awards |>
+  left_join(
+    laureates,
+    by = "laureate_id",
+    relationship = "many-to-one"
+  )
+
+# Display the first 10 records
+knitr::kable(head(nobel_combined, 10))
+
+```
+
+```{r}
+nrow(awards)
+nrow(nobel_combined)
+```
+
+### Analyzing Gender Representation by Decade
+
+To examine changes in gender representation, I will group Nobel Prize award-recipient records by decade and calculate the percentage associated with women. I will exclude organizations and records without a reported male or female gender to ensure the percentages are based on individual laureates with known gender information. This analysis will help identify whether women's representation has changed over time.
+
+```{r}
+#| label: gender-by-decade
+
+# Calculate the percentage of female award recipients by decade
+gender_by_decade <- nobel_combined |>
+  filter(
+    gender %in% c("female", "male"),
+    award_year >= 1901,
+    award_year <= 2026
+  ) |>
+  mutate(
+    decade = floor(award_year / 10) * 10
+  ) |>
+  group_by(decade) |>
+  summarise(
+    total_awards = n(),
+    female_awards = sum(gender == "female"),
+    female_percentage = round(
+      female_awards / total_awards * 100, 2
+    ),
+    .groups = "drop"
+  ) |>
+  arrange(decade)
+
+# Display the results
+knitr::kable(gender_by_decade)
+```
+
+### Visualizing Gender Representation Over Time
+
+To better understand changes in gender representation, I will create a line chart showing the percentage of Nobel Prize award-recipient records associated with women across decades. This visualization will help identify long-term trends, periods of growth, and possible fluctuations in female representation.
+
+```{r}
+#| label: fig-gender-trend
+#| fig-cap: "Percentage of female Nobel Prize award recipients by decade, 1901–2026."
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(gender_by_decade,
+       aes(x = decade, y = female_percentage)) +
+  geom_line(color = "#2878B5", linewidth = 1.2) +
+  geom_point(color = "#2878B5", size = 2.5) +
+  scale_x_continuous(
+    breaks = seq(1900, 2020, by = 20)
+  ) +
+  scale_y_continuous(
+    labels = scales::label_percent(scale = 1)
+  ) +
+  labs(
+    title = "Female Nobel Prize Recipients Over Time",
+    subtitle = "Percentage of individual award-recipient records by decade",
+    x = "Decade",
+    y = "Female recipients (%)",
+    caption = "Source: Nobel Prize API | 2020s data through 2026"
+  ) +
+  theme_minimal()
+```
+
+### Findings — Question 1
+
+The analysis shows that female representation among Nobel Prize award recipients **\[increased/decreased/remained relatively stable\]** between 1901 and 2026. The decade with the highest female representation was **\[decade\]**, when women accounted for **\[percentage\]%** of eligible award-recipient records. Compared with earlier decades, the results suggest **\[describe the pattern observed in your data\]**.
+
+Although the findings show how representation has changed over time, they do not explain the underlying reasons for these differences. Additionally, the 2020s represent an incomplete decade, so comparisons with earlier decades should be interpreted cautiously.
+
+## Question 2 
+
+Which Nobel Prize categories tend to recognize laureates at younger or older ages?
+
+For this analysis, I will use each laureate's birth date and Nobel Prize award year to calculate their approximate age at recognition. I will then compare ages across the six Nobel Prize categories to determine which fields tend to recognize recipients earlier or later in life. Records with missing or incomplete birth information will be excluded from the age calculations.
+
+```{r}
+#| label: calculate-laureate-age
+
+# Calculate approximate age at Nobel Prize recognition
+laureate_ages <- nobel_combined |>
+  mutate(
+    birth_year = as.integer(
+      substr(birth_date, 1, 4)
+    ),
+    age_at_award = award_year - birth_year
+  ) |>
+  filter(
+    !is.na(birth_year),
+    !is.na(award_year),
+    age_at_award >= 0,
+    age_at_award <= 120
+  )
+
+# Display the first 10 records
+knitr::kable(
+  laureate_ages |>
+    select(
+      name,
+      category,
+      birth_year,
+      award_year,
+      age_at_award
+    ) |>
+    head(10)
+)
+```
+
+```{r}
+# Number of award-recipient records with valid ages
+nrow(laureate_ages)
+
+# Summary of calculated ages
+summary(laureate_ages$age_at_award)
+
+# Number of records excluded from the age analysis
+nrow(nobel_combined) - nrow(laureate_ages)
+```
+
+### Comparing Laureate Ages by Nobel Prize Category
+
+To determine whether age at recognition differs across Nobel Prize categories, I will calculate the median and mean age for each category. I will also include the number of award-recipient records in each group to provide context for the comparisons. The results will be organized from the youngest to the oldest median age.
+
+```{r}
+#| label: age-by-category
+
+# Calculate summary statistics for each Nobel Prize category
+age_by_category <- laureate_ages |>
+  group_by(category) |>
+  summarise(
+    total_recipients = n(),
+    median_age = median(age_at_award),
+    mean_age = round(mean(age_at_award), 1),
+    youngest_age = min(age_at_award),
+    oldest_age = max(age_at_award),
+    .groups = "drop"
+  ) |>
+  arrange(median_age)
+
+# Display the summary table
+knitr::kable(
+  age_by_category,
+  caption = "Approximate Age at Nobel Prize Recognition by Category"
+)
+```
+
+```{r}
+# Category with the youngest median age
+age_by_category |>
+  slice_min(median_age, n = 1)
+
+# Category with the oldest median age
+age_by_category |>
+  slice_max(median_age, n = 1)
+```
+
+### Visualizing Age Differences Across Categories
+
+To compare the typical age at recognition across Nobel Prize categories, I will create a horizontal bar chart displaying the median age for each category. Using the median allows me to compare age distributions while reducing the influence of unusually young or old recipients. The categories will be arranged from youngest to oldest median age to make the differences easier to identify.
+
+```{r}
+#| label: fig-age-by-category
+#| fig-cap: "Median age at Nobel Prize recognition by category."
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(
+  age_by_category,
+  aes(
+    x = reorder(category, median_age),
+    y = median_age
+  )
+) +
+  geom_col(fill = "#2878B5", width = 0.7) +
+  geom_text(
+    aes(label = median_age),
+    hjust = -0.3,
+    size = 4
+  ) +
+  coord_flip() +
+  scale_y_continuous(
+    limits = c(0, max(age_by_category$median_age) + 10)
+  ) +
+  labs(
+    title = "Age at Nobel Prize Recognition",
+    subtitle = "Median recipient age across Nobel Prize categories",
+    x = "Nobel Prize Category",
+    y = "Median Age (Years)",
+    caption = "Source: Nobel Prize API | Ages are approximate"
+  ) +
+  theme_minimal()
+```
+
+### Findings — Question 2
+
+The analysis shows that the typical age at Nobel Prize recognition varies across categories. Physics had the youngest median recipient age at 56 years, followed by Chemistry and Physiology or Medicine at 58 years. Peace Prize recipients had a median age of 62 years, while Literature and Economic Sciences had the oldest median ages at 67 years.
+
+This represents an 11-year difference between the youngest and oldest median ages. Overall, the findings suggest that Nobel Prize recipients in scientific fields, particularly Physics, tend to receive recognition at younger ages than those in Literature and Economic Sciences. However, these differences are descriptive and do not establish why recognition occurs earlier or later across fields. Ages were approximated using birth years and award years.
+
+## Question 3 
+
+Which laureates have received more than one Nobel Prize, and did they win in the same category or different categories?
+
+For this analysis, I will identify laureates who received multiple Nobel Prizes by grouping award records using their unique laureate IDs. I will calculate the number of awards received by each laureate and compare their award categories to determine whether they were recognized in the same field or across different fields.
+
+```{r}
+#| label: multiple-nobel-laureates
+
+# Identify laureates who received more than one Nobel Prize
+multiple_laureates <- nobel_combined |>
+  group_by(laureate_id, name) |>
+  summarise(
+    total_awards = n(),
+    award_years = paste(
+      sort(award_year),
+      collapse = ", "
+    ),
+    categories = paste(
+      sort(unique(category)),
+      collapse = ", "
+    ),
+    distinct_categories = n_distinct(category),
+    .groups = "drop"
+  ) |>
+  filter(total_awards > 1) |>
+  mutate(
+    recognition_type = if_else(
+      distinct_categories > 1,
+      "Different categories",
+      "Same category"
+    )
+  ) |>
+  arrange(desc(total_awards), name)
+
+# Display the results
+knitr::kable(
+  multiple_laureates,
+  caption = "Laureates Who Received Multiple Nobel Prizes"
+)
+```
+
+```{r}
+# Count laureates who received multiple awards
+nrow(multiple_laureates)
+
+# Count laureates by recognition type
+multiple_laureates |>
+  count(recognition_type)
+```
+
+### Summarizing Multiple Nobel Prize Recipients
+
+To summarize the findings, I will compare the number of laureates who received multiple Nobel Prizes in the same category with those recognized across different categories. This will help determine whether repeat recipients tend to be recognized within a single field or across multiple disciplines.
+
+```{r}
+#| label: summarize-multiple-laureates
+
+# Summarize repeat recipients by recognition type
+multiple_summary <- multiple_laureates |>
+  count(recognition_type, name = "total_laureates") |>
+  mutate(
+    percentage = round(
+      total_laureates / sum(total_laureates) * 100, 1
+    )
+  )
+
+# Display summary table
+knitr::kable(
+  multiple_summary,
+  caption = "Repeat Nobel Laureates by Award Category Type"
+)
+```
+
+### Findings — Question 3
+
+The analysis identified 7 laureates who received more than one Nobel Prize. Of these, 5 laureates (71.4%) received multiple awards within the same category, while 2 laureates (28.6%) were recognized across different categories.
+
+These findings suggest that repeat Nobel Prize recognition occurs more frequently within the same field than across different disciplines. However, because only seven laureates were identified, the results should be interpreted cautiously. The analysis demonstrates how grouping award records and comparing categories can reveal patterns among repeat Nobel Prize recipients.
+
+## Question 4
+
+Which birth countries have the most Nobel laureates affiliated with institutions in another country at the time of their award?
+
+For this analysis, I will compare each laureate's birth country with the country of their institutional affiliation at the time they received their Nobel Prize. I will extract affiliation information from the nested JSON data and connect it with laureate demographic information. By filtering records where the two countries differ, I can identify patterns of international mobility among Nobel Prize recipients.
+
+This analysis focuses on institutional affiliation rather than citizenship or nationality. Therefore, the results will reflect international differences between birthplace and professional affiliation, rather than proving that laureates permanently migrated or changed citizenship.
+
+```{r}
+#| label: explore-affiliations
+
+# Find the first laureate with affiliation information
+example_laureate <- purrr::keep(
+  all_laureates,
+  function(person) {
+    any(purrr::map_lgl(
+      person$nobelPrizes,
+      ~ length(.x$affiliations) > 0
+    ))
+  }
+)[[1]]
+
+# Select the first prize containing affiliation data
+example_prize <- purrr::keep(
+  example_laureate$nobelPrizes,
+  ~ length(.x$affiliations) > 0
+)[[1]]
+
+# Examine the affiliation structure
+str(example_prize$affiliations, max.level = 3)
+```
+
+### Extracting Institutional Affiliation Data
+
+To investigate international mobility, I will extract institutional affiliation information from the nested Nobel Prize JSON records. The new data frame will contain each laureate's ID, award year, Nobel Prize category, institution name, and affiliation country. Since some laureates have multiple affiliations, each institution will be represented as a separate observation. Records without affiliation information will be excluded from this table.
+
+```{r}
+#| label: extract-affiliations
+
+# Extract institutional affiliation records
+affiliations <- purrr::map_dfr(
+  all_laureates,
+  function(person) {
+    
+    purrr::map_dfr(
+      person$nobelPrizes,
+      function(prize) {
+        
+        # Retrieve institutional affiliations
+        institutions <- prize$affiliations
+        
+        # Skip awards without affiliation information
+        if (is.null(institutions) ||
+            length(institutions) == 0) {
+          return(tibble())
+        }
+        
+        # Create one row per institution
+        purrr::map_dfr(
+          institutions,
+          function(institution) {
+            
+            # Prefer present-day country name
+            country_now <- get_value(
+              institution,
+              c("countryNow", "en")
+            )
+            
+            # Use recorded country if present-day is missing
+            if (is.na(country_now)) {
+              country_now <- get_value(
+                institution,
+                c("country", "en")
+              )
+            }
+            
+            tibble(
+              laureate_id = get_value(person, c("id")),
+              award_year = as.integer(
+                get_value(prize, c("awardYear"))
+              ),
+              category = get_value(
+                prize, c("category", "en")
+              ),
+              institution = get_value(
+                institution, c("name", "en")
+              ),
+              affiliation_country = country_now
+            )
+          }
+        )
+      }
+    )
+  }
+)
+
+# Display the first 10 records
+knitr::kable(head(affiliations, 10))
+```
+
+### Comparing Birth Countries and Institutional Affiliations
+
+To investigate international mobility, I will join the laureate demographic data with their institutional affiliations using the shared `laureate_id` field. I will then compare each laureate's birth country with the country of their affiliated institution and identify records where the countries differ. Records with missing country information will be excluded to ensure valid comparisons.
+
+```{r}
+#| label: compare-birth-affiliation
+
+# Join affiliation records with selected laureate information
+mobility_data <- affiliations |>
+  left_join(
+    laureates |>
+      select(laureate_id, name, birth_country),
+    by = "laureate_id",
+    relationship = "many-to-one"
+  )
+
+# Check the joined columns
+names(mobility_data)
+
+# Keep records with different birth and affiliation countries
+international_laureates <- mobility_data |>
+  filter(
+    !is.na(birth_country),
+    !is.na(affiliation_country),
+    birth_country != affiliation_country
+  ) |>
+  distinct(
+    laureate_id,
+    name,
+    birth_country,
+    affiliation_country
+  )
+
+# Display the results
+knitr::kable(
+  head(international_laureates, 10),
+  caption = "Nobel Laureates with Different Birth and Affiliation Countries"
+)
+```
+
+```{r}
+names(mobility_data)
+nrow(international_laureates)
+```
+
+```{r}
+# Count unique laureates with international affiliations
+n_distinct(international_laureates$laureate_id)
+
+# Count distinct birth countries represented
+n_distinct(international_laureates$birth_country)
+
+# Check the first 10 records
+head(international_laureates, 10)
+```
+
+```{r}
+# View the first 10 international laureate records
+head(international_laureates, 10)
+
+# Confirm that all retained country pairs differ
+all(
+  international_laureates$birth_country !=
+    international_laureates$affiliation_country
+)
+```
+
+### Ranking Birth Countries by International Affiliations
+
+After identifying laureates whose birth countries differ from their institutional affiliation countries, I will group the records by birth country and count the number of unique laureates. This will allow me to determine which countries have produced the largest numbers of Nobel laureates who were affiliated with institutions abroad at the time of their awards. To avoid double-counting laureates with multiple international affiliations, I will use their unique laureate IDs.
+
+```{r}
+#| label: rank-birth-countries
+
+# Count unique laureates by birth country
+country_mobility <- international_laureates |>
+  dplyr::group_by(birth_country) |>
+  dplyr::summarise(
+    total_laureates = dplyr::n_distinct(laureate_id),
+    .groups = "drop"
+  ) |>
+  dplyr::arrange(dplyr::desc(total_laureates))
+
+# Display the top 10 countries
+knitr::kable(
+  head(country_mobility, 10),
+  caption = "Top 10 Birth Countries of Internationally Affiliated Nobel Laureates"
+)
+```
+
+```{r}
+nrow(country_mobility)
+
+sum(country_mobility$total_laureates)
+
+head(country_mobility, 10)
+```
+
+```{r}
+n_distinct(international_laureates$laureate_id)
+```
+
+### Visualizing International Affiliation Patterns
+
+To visualize the results, I will create a horizontal bar chart showing the ten birth countries with the highest numbers of Nobel laureates affiliated with institutions abroad. The chart will rank countries by the number of unique laureates, allowing for a clearer comparison of international affiliation patterns.
+
+```{r}
+#| label: fig-international-mobility
+#| fig-cap: "Top 10 birth countries of Nobel laureates with foreign institutional affiliations."
+#| fig-width: 9
+#| fig-height: 6
+
+# Select the top 10 birth countries
+top_10_countries <- country_mobility |>
+  slice_max(total_laureates, n = 10, with_ties = FALSE)
+
+# Create a horizontal bar chart
+ggplot(
+  top_10_countries,
+  aes(
+    x = reorder(birth_country, total_laureates),
+    y = total_laureates
+  )
+) +
+  geom_col(fill = "#2878B5", width = 0.7) +
+  geom_text(
+    aes(label = total_laureates),
+    hjust = -0.3,
+    size = 4
+  ) +
+  coord_flip() +
+  scale_y_continuous(
+    limits = c(0, max(top_10_countries$total_laureates) + 5),
+    breaks = scales::breaks_pretty()
+  ) +
+  labs(
+    title = "International Affiliations Among Nobel Laureates",
+    subtitle = "Top 10 birth countries by number of laureates affiliated abroad",
+    x = "Birth Country",
+    y = "Number of Unique Laureates",
+    caption = "Source: Nobel Prize API"
+  ) +
+  theme_minimal()
+```
+
+### Findings — Question 4
+
+The analysis identified 255 unique Nobel laureates from 56 birth countries who had institutional affiliations in countries different from their birth countries. Germany ranked highest with 27 laureates, followed by the United Kingdom (24) and Poland (19). France and Canada each had 15, while Russia and Austria each had 11. Hungary, Scotland, and the Netherlands each had 9.
+
+These findings highlight the international nature of Nobel Prize recognition, with many laureates affiliated with institutions outside their birth countries. However, the results reflect institutional affiliations rather than confirmed migration or citizenship changes. Additionally, the analysis is limited to laureates with available affiliation information, and the counts do not account for differences in the total number of Nobel laureates born in each country.
+
+## Conclusion
+
+This assignment allowed me to explore Nobel Prize data using JSON and R to identify patterns in gender representation, age at recognition, multiple-award recipients, and international affiliations. The findings showed differences in recognition across decades and award categories, while also highlighting the international backgrounds of many laureates. By retrieving data from a public API, transforming nested JSON into tidy data frames, and using joins, summaries, and visualizations, I strengthened my understanding of data acquisition and analysis.
